@@ -22,8 +22,8 @@ type UserInFund @entity {
   redeemingShareAmount: BigInt!
   avgNetAssetValuePerShare: BigDecimal!
 
-  # purchases: [Purchase!]! @derivedFrom(field: "to")
-  # redeems: [Redeem!]! @derivedFrom(field: "to")
+  purchases: [Purchase!]! @derivedFrom(field: "userInFund")
+  redeems: [Redeem!]! @derivedFrom(field: "userInFund")
 }
 
 type Fund @entity {
@@ -69,6 +69,7 @@ type Purchase @entity {
   timestamp: BigInt!
   fund: Fund!
   to: User!
+  userInFund: UserInFund!
   shareAmount: BigDecimal!
   netAssetValuePerShare: BigDecimal!
   logIndex: BigInt
@@ -81,6 +82,7 @@ type Redeem @entity {
   timestamp: BigInt!
   fund: Fund!
   to: User!
+  userInFund: UserInFund!
   shareAmount: BigDecimal!
   netAssetValuePerShare: BigDecimal!
   logIndex: BigInt
