@@ -16,7 +16,14 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
+        - Transaction
+        - User
+        - UserInFund
+        - Fund
         - Purchase
+        - Redeem
+        - FundHourData
+        - FundBlockData
       abis:
         - name: Fund
           file: ./abis/Fund.json
@@ -31,21 +38,19 @@ dataSources:
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
       eventHandlers:
-        - event: Purchase(address, uint256, uint256)
-          handler: handlePurchase()
-        - event: Redeem(address, uint256, uint256)
-          handler: hanldeRedeem()
-        - event: Transfer()
-          handler: handlehandleTransfer
+        - event: Purchase(indexed address,uint256,uint256)
+          handler: handlePurchase
+        - event: Redeem(indexed address,uint256,uint256)
+          handler: hanldeRedeem
         - event: SetParameter(bytes32,int256)
           handler: handleSetParameter
-        - event: SetManager(address, address)
+        - event: SetManager(indexed address,indexed address)
           handler: handleSetManager
-        - event: Transfer(address, uint256, uint256)
+        - event: Transfer(indexed address,indexed address,uint256)
           handler: handlehandleTransfer
-        - event: IncreaseRedeemingShareBalance(address, uint256)
+        - event: IncreaseRedeemingShareBalance(indexed address,uint256)
           handler: handleIncreaseRedeemingShareBalance
-        - event: DecreaseRedeemingShareBalance(address, uint256)
+        - event: DecreaseRedeemingShareBalance(indexed address,uint256)
           handler: handleDecreaseRedeemingShareBalance
       blockHandlers:
         - handler: handleBlock

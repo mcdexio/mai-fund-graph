@@ -22,8 +22,8 @@ type UserInFund @entity {
   redeemingShareAmount: BigInt!
   avgNetAssetValuePerShare: BigDecimal!
 
-  purchases: [Purchase!]! @derivedFrom(field: "to")
-  redeems: [Redeem!]! @derivedFrom(field: "to")
+  # purchases: [Purchase!]! @derivedFrom(field: "to")
+  # redeems: [Redeem!]! @derivedFrom(field: "to")
 }
 
 type Fund @entity {
