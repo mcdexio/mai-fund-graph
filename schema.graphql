@@ -1,0 +1,106 @@
+type Transaction @entity {
+  # transaction hash
+  id: ID!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  purchases: [Purchase]!
+  redeems: [Redeem]!
+}
+
+type User @entity {
+  # user address
+  id: ID!
+  userInFunds: [UserInFund!]! @derivedFrom(field:"user")
+}
+
+type UserInFund @entity {
+  # user address + "-" + fund address
+  id: ID!
+  user: User!
+  fund: Fund!
+  shareAmount: BigInt!
+  redeemingShareAmount: BigInt!
+  avgNetAssetValuePerShare: BigDecimal!
+
+  purchases: [Purchase!]! @derivedFrom(field: "to")
+  redeems: [Redeem!]! @derivedFrom(field: "to")
+}
+
+type Fund @entity {
+  # fund address
+  id: ID!
+  symbol: String!
+  name: String!
+  # decimals: BigInt!
+  perpetualAddress: String!
+
+  # contract state: Normal, Emergency, Shutdown
+  state: Int!
+
+  # contract param
+  redeemingLockPeriod: BigInt!
+  entranceFeeRate: BigInt!
+  streamingFeeRate: BigInt!
+  performanceFeeRate: BigInt!
+  globalRedeemingSlippage: BigInt!
+  cap: BigInt!
+  drawdownHighWaterMark: BigInt!
+  leverageHighWaterMark: BigInt!
+
+  # AutoTrading fund
+  rebalanceSlippage: BigInt
+  rebalanceTolerance: BigInt
+
+  # SocialTrading fund
+  manager: String
+
+  totalSupply: BigInt!
+  initNetAssetValuePerShare: BigDecimal!
+  
+  userInFunds: [UserInFund!]! @derivedFrom(field:"fund")
+  purchases: [Purchase!]! @derivedFrom(field: "fund")
+  redeems: [Redeem!]! @derivedFrom(field: "fund")
+}
+
+type Purchase @entity {
+  # transaction hash + "-" + index in purchase Transaction array
+  id: ID!
+  transaction: Transaction!
+  timestamp: BigInt!
+  fund: Fund!
+  to: User!
+  shareAmount: BigDecimal!
+  netAssetValuePerShare: BigDecimal!
+  logIndex: BigInt
+}
+
+type Redeem @entity {
+  # transaction hash + "-" + index in redeem Transaction array
+  id: ID!
+  transaction: Transaction!
+  timestamp: BigInt!
+  fund: Fund!
+  to: User!
+  shareAmount: BigDecimal!
+  netAssetValuePerShare: BigDecimal!
+  logIndex: BigInt
+}
+
+type FundHourData @entity {
+  # fund address + "-" + hourIndex
+  id: ID!
+  hourStartUnix: Int! # unix timestamp for start of hour
+  fund: Fund!
+  netAssetValuePerShareCollateral: BigDecimal!
+  netAssetValuePerShareUSD: BigDecimal!
+}
+
+type FundBlockData @entity {
+  # fund address + "-" + blocknumber
+  id: ID!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  fund: Fund!
+  netAssetValuePerShareCollateral: BigDecimal!
+  netAssetValuePerShareUSD: BigDecimal! 
+}

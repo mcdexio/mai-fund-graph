@@ -1,0 +1,52 @@
+specVersion: 0.0.2
+description: mai-fund-graph
+repository: https://github.com/mcdexio/mai-fund-graph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: mai-fund-graph
+    network: mainnet
+    source:
+      address: '0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1'
+      abi: Fund
+      startBlock: 44100
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Purchase
+      abis:
+        - name: Fund
+          file: ./abis/Fund.json
+        - name: SocialTradingFund
+          file: ./abis/SocialTradingFund.json
+        - name: AutoTradingFund
+          file: ./abis/AutoTradingFund.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: Purchase(address, uint256, uint256)
+          handler: handlePurchase()
+        - event: Redeem(address, uint256, uint256)
+          handler: hanldeRedeem()
+        - event: Transfer()
+          handler: handlehandleTransfer
+        - event: SetParameter(bytes32,int256)
+          handler: handleSetParameter
+        - event: SetManager(address, address)
+          handler: handleSetManager
+        - event: Transfer(address, uint256, uint256)
+          handler: handlehandleTransfer
+        - event: IncreaseRedeemingShareBalance(address, uint256)
+          handler: handleIncreaseRedeemingShareBalance
+        - event: DecreaseRedeemingShareBalance(address, uint256)
+          handler: handleDecreaseRedeemingShareBalance
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/fund.ts

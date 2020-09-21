@@ -1,0 +1,16 @@
+{
+  "name": "mc-fund",
+  "version": "0.1.0",
+  "scripts": {
+    "create": "graph create mcdexio/mc-fund --node https://api.thegraph.com/deploy/",
+    "create-local": "graph create mcdexio/mc-fund --node http://10.30.206.10:8020",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy mcdexio/mc-fund --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy-local": "graph deploy mcdexio/mc-fund --ipfs http://10.30.206.10:5001 --node http://10.30.206.10:8020"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.18.0",
+    "@graphprotocol/graph-ts": "^0.18.0"
+  }
+}
