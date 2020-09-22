@@ -229,7 +229,7 @@ export function handleBlock(block: ethereum.Block): void {
             fundHourData.fund = fund.id
             fundHourData.hourStartUnix = hourStartUnix
             let fundContract = FundContract.bind(Address.fromString(FUND_LIST[i]))
-            let netAssetValuePerShare = ZERO_BD
+            let netAssetValuePerShare = ZERO_BI
 
             let callResult = fundContract.try_netAssetValuePerShare()
             if(callResult.reverted){
@@ -247,8 +247,8 @@ export function handleBlock(block: ethereum.Block): void {
                 markPrice = callResult.value
             }
 
-            let netValueInUSD = ZERO_BD
-            let netValue = ZERO_BD
+            let netValueInUSD = ZERO_BI
+            let netValue = ZERO_BI
 
             if (isUSDCollateral(fund.collateral)) {
                 netValueInUSD = netAssetValuePerShare
