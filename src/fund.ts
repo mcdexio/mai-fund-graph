@@ -37,39 +37,27 @@ import { Fund, Purchase, Redeem, Transaction, FundBlockData, FundHourData } from
 
 export function handleSetParameter(event: SetParameterEvent): void {
     let fund = fetchFund(event.address)
-    switch(event.params.key.toString()) {
-        case "cap":
-            fund.cap = event.params.value
-            break
-        case "redeemingLockPeriod":
-            fund.redeemingLockPeriod = event.params.value
-            break
-        case "entranceFeeRate":
-            fund.entranceFeeRate = event.params.value
-            break
-        case "streamingFeeRate":
-            fund.streamingFeeRate = event.params.value
-            break
-        case "performanceFeeRate":
-            fund.performanceFeeRate = event.params.value
-            break
-        case "globalRedeemingSlippage":
-            fund.globalRedeemingSlippage = event.params.value
-            break
-        case "drawdownHighWaterMark":
-            fund.drawdownHighWaterMark = event.params.value
-            break
-        case "leverageHighWaterMark":
-            fund.leverageHighWaterMark = event.params.value
-            break
-        case "rebalanceSlippage":
-            fund.rebalanceSlippage = event.params.value
-            break
-        case "rebalanceTolerance":
-            fund.rebalanceTolerance = event.params.value
-            break
-        default:
-            return
+    let key = event.params.key.toString()
+    if (key == "cap") {
+        fund.cap = event.params.value
+    } else if (key == "redeemingLockPeriod") {
+        fund.redeemingLockPeriod = event.params.value
+    } else if (key == "entranceFeeRate") {
+        fund.entranceFeeRate = event.params.value
+    } else if (key == "streamingFeeRate") {
+        fund.streamingFeeRate = event.params.value
+    } else if (key == "performanceFeeRate") {
+        fund.performanceFeeRate = event.params.value
+    } else if (key == "globalRedeemingSlippage") {
+        fund.globalRedeemingSlippage = event.params.value
+    } else if (key == "drawdownHighWaterMark") {
+        fund.drawdownHighWaterMark = event.params.value
+    } else if (key == "leverageHighWaterMark") {
+        fund.leverageHighWaterMark = event.params.value
+    } else if (key == "rebalanceSlippage") {
+        fund.rebalanceSlippage = event.params.value
+    } else if (key == "rebalanceTolerance") {
+        fund.rebalanceTolerance = event.params.value
     }
     fund.save()
 }

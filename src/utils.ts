@@ -17,27 +17,29 @@ export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 
 export let FUND_LIST:string[] = ["0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1"]
-const FUND_RSI = {
-  "0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1": "0x793f396873Ae7394311b0fAb7644aE182CF9093B"
-}
+export let FUND_RSI_LIST:string[] = ["0x793f396873Ae7394311b0fAb7644aE182CF9093B"]
 
 // added ["USDT", "USDC", "DAI"]
-const USDTokens = {
-  "0xdac17f958d2ee523a2206206994597c13d831ec7": true,
-  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": true,
-  "0x6b175474e89094c44da98b954eedeac495271d0f": true
-}
+export let USDTokens:string[] = [
+  "0xdac17f958d2ee523a2206206994597c13d831ec7",
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6b175474e89094c44da98b954eedeac495271d0f"
+]
 
 export function isUSDCollateral(collateral: string): boolean {
-    if (USDTokens[collateral]){
+  for (let i = 0; i < USDTokens.length; i++) {
+    if (collateral == USDTokens[i]) {
       return true
     }
-    return false
+  }
+  return false
 }
 
 export function getRSITrendingStrategy(address: Address): string {
-  if (FUND_RSI[address.toHexString()]) {
-    return FUND_RSI[address.toHexString()]
+  for (let i = 0; i < FUND_LIST.length; i++) {
+    if (address.toHexString() == FUND_LIST[i]) {
+      return FUND_RSI_LIST[i]
+    }
   }
   return ""
 }
