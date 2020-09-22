@@ -1,4 +1,4 @@
-import { log, BigInt, BigDecimal, Address, Hash } from '@graphprotocol/graph-ts'
+import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
 
 import { Fund, User, UserInFund } from '../generated/schema'
 
@@ -6,7 +6,6 @@ import { ERC20 } from '../generated/mai-fund-graph/ERC20'
 import { ERC20SymbolBytes } from '../generated/mai-fund-graph/ERC20SymbolBytes'
 import { ERC20NameBytes } from '../generated/mai-fund-graph/ERC20NameBytes'
 import { Fund as FundContract } from '../generated/mai-fund-graph/Fund'
-import { Perpetual } from '../generated/mai-fund-graph/Perpetual'
 
 
 
@@ -17,7 +16,7 @@ export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 
-export let FUND_LIST = ["0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1"]
+export let FUND_LIST:string[] = ["0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1"]
 const FUND_RSI = {
   "0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1": "0x793f396873Ae7394311b0fAb7644aE182CF9093B"
 }
@@ -176,7 +175,7 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
   return symbolValue
 }
 
-export function fetchPerpetualAddress(address: Address): Address {
+export function fetchPerpetualAddress(address: Address): string {
   let contract = FundContract.bind(address)
   let perpetual = ''
   let result = contract.try_perpetual()
@@ -186,7 +185,7 @@ export function fetchPerpetualAddress(address: Address): Address {
   return perpetual
 }
 
-export function fetchCollateral(address: Address): Address {
+export function fetchCollateral(address: Address): string {
   let contract = FundContract.bind(address)
   let collateral = ''
   let result = contract.try_collateral()

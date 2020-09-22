@@ -4,10 +4,9 @@ import {
     Redeem as RedeemEvent,
     Transfer as TransferEvent,
     SetParameter as SetParameterEvent,
-    SetManager as SetManagerEvent,
     IncreaseRedeemingShareBalance as IncreaseRedeemingShareBalanceEvent,
     DecreaseRedeemingShareBalance as DecreaseRedeemingShareBalanceEvent,
-    FundContract
+    Fund as FundContract
 } from '../generated/mai-fund-graph/Fund';
 
 import {
@@ -17,6 +16,10 @@ import {
 import {
     RSITrendingStrategy,
 } from '../generated/mai-fund-graph/RSITrendingStrategy';
+
+import {
+    SetManager as SetManagerEvent,
+} from '../generated/mai-fund-graph/SocialTradingFund';
 
 import {
     fetchFund,
@@ -100,7 +103,7 @@ export function handleTransfer(event:TransferEvent): void {
     if (from.toHexString() == ADDRESS_ZERO) {
         let purchases = transaction.purchases
         if (purchases.length === 0) {
-            let purchase = new PurchaseEvent(
+            let purchase = new Purchase(
                 event.transaction.hash
                   .toHexString()
                   .concat('-')
@@ -124,7 +127,7 @@ export function handleTransfer(event:TransferEvent): void {
     if (to.toHexString() == ADDRESS_ZERO) {
         let redeems = transaction.purchases
         if (redeems.length === 0) {
-            let redeem = new RedeemEvent(
+            let redeem = new Redeem(
                 event.transaction.hash
                   .toHexString()
                   .concat('-')
@@ -146,14 +149,14 @@ export function handleTransfer(event:TransferEvent): void {
 
     // swap
     if (from.toHexString() != ADDRESS_ZERO && to.toHexString() != ADDRESS_ZERO) {
-        let swapedAssetValue = userInFundFrom.assetValue.div(userInFundFrom.shareAmount).times(userFrom.shareAmount.minus(event.params.value))
-        userInFundFrom.shareAmount = userFrom.shareAmount.minus(event.params.value)
+        let swapedAssetValue = userInFundFrom.assetValue.div(userInFundFrom.shareAmount.toBigDecimal()).times(userInFundFrom.shareAmount.minus(event.params.value).toBigDecimal())
+        userInFundFrom.shareAmount = userInFundFrom.shareAmount.minus(event.params.value)
         userInFundFrom.assetValue = userInFundFrom.assetValue.minus(swapedAssetValue)
         userInFundFrom.save()
     
-        userInFundTo.shareAmount = userTo.shareAmount.plus(event.params.value)
+        userInFundTo.shareAmount = userInFundTo.shareAmount.plus(event.params.value)
         userInFundTo.assetValue = userInFundTo.assetValue.plus(swapedAssetValue)
-        userTo.save()
+        userInFundTo.save()
     }
 }
 
@@ -162,7 +165,7 @@ export function handlePurchase(event: PurchaseEvent): void {
     let purchases = transaction.purchases
     let purchase = Purchase.load(purchases[purchases.length - 1])
 
-    purchase.netAssetValuePerShare = event.params.netAssetValue
+    purchase.netAssetValuePerShare = event.params.netAssetValuePerShare
     purchase.logIndex = event.logIndex
     purchase.save()
 
@@ -172,12 +175,12 @@ export function handlePurchase(event: PurchaseEvent): void {
     purchases.push(purchase.id)
     userInFund.purchases = purchases
     userInFund.shareAmount = userInFund.shareAmount.plus(event.params.shareAmount)
-    userInFund.assetValue = userInFund.assetValue.plus(event.params.netAssetValue.toBigDecimal().times(event.params.shareAmount.toBigDecimal()))
+    userInFund.assetValue = userInFund.assetValue.plus(event.params.netAssetValuePerShare.toBigDecimal().times(event.params.shareAmount.toBigDecimal()))
     userInFund.save()
 
     let fund = fetchFund(event.address)
     if (fund.totalSupply == ZERO_BI) {
-       fund.initNetAssetValuePerShare = event.params.netAssetValue.toBigDecimal() 
+       fund.initNetAssetValuePerShare = event.params.netAssetValuePerShare.toBigDecimal() 
     }
     purchases = fund.purchases
     purchases.push(purchase.id)
@@ -237,8 +240,8 @@ export function handleBlock(block: ethereum.Block): void {
         blockData.blockNumber = block.number
         blockData.fund = fund.id
 
-        let fundContract = FundContract.bind(FUND_LIST[i])
-        let netAssetValuePerShare = BigInt.fromI32(0)
+        let fundContract = FundContract.bind(Address.fromString(FUND_LIST[i]))
+        let netAssetValuePerShare = ZERO_BD
 
         let callResult = fundContract.try_netAssetValuePerShare()
         if(callResult.reverted){
@@ -247,7 +250,7 @@ export function handleBlock(block: ethereum.Block): void {
             netAssetValuePerShare = callResult.value
         }
 
-        let perpetual = Perpetual.bind(fund.perpetual)
+        let perpetual = Perpetual.bind(Address.fromString(fund.perpetual))
         let markPrice = ONE_BD
         callResult = perpetual.try_markPrice()
         if(callResult.reverted){
@@ -274,7 +277,7 @@ export function handleBlock(block: ethereum.Block): void {
         let nextTraget = ZERO_BI
         let currentRSI = ZERO_BI
         if (fund.RSITrendingStrategy != "") {
-            let strategy = RSITrendingStrategy.bind(fund.RSITrendingStrategy)
+            let strategy = RSITrendingStrategy.bind(Address.fromString(fund.RSITrendingStrategy))
             callResult = strategy.try_getCurrentRSI()
             if(callResult.reverted){
                 log.warning("Get try_getCurrentRSI reverted at block: {}", [block.number.toString()])
