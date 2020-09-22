@@ -77,9 +77,6 @@ export function fetchFund(address: Address): Fund {
       fund.totalSupply = ZERO_BI
       fund.initNetAssetValuePerShare = ZERO_BD
 
-      fund.userInFunds = []
-      fund.purchases = []
-      fund.redeems = []
       fund.save()
     }
     return fund as Fund
@@ -89,7 +86,6 @@ export function fetchUser(address: Address): User {
   let user = User.load(address.toHexString())
   if (user === null) {
     user = new User(address.toHexString())
-    user.userInFunds = []
     user.save()
   }
   return user as User
@@ -111,8 +107,6 @@ export function fetchUserInFund(userAddress: Address, fundAddress: Address): Use
     userInFund.shareAmount = ZERO_BI
     userInFund.redeemingShareAmount = ZERO_BI
     userInFund.assetValue = ZERO_BD
-    userInFund.purchases = []
-    userInFund.redeems = []
 
     let newUserInFunds = user.userInFunds
     newUserInFunds.push(userInFund.id)
