@@ -186,17 +186,10 @@ export function handleRedeem(event: RedeemEvent): void {
     userInFund.shareAmount = userInFund.shareAmount.minus(event.params.shareAmount)
     userInFund.assetValue = userInFund.assetValue.minus(event.params.returnedCollateral)
     userInFund.totalRedeemValue = userInFund.totalRedeemValue.plus(event.params.returnedCollateral)
-
-    redeems = userInFund.redeems
-    redeems.push(redeem.id)
-    userInFund.redeems = redeems
     userInFund.save()
 
     let fund = fetchFund(event.address)
     fund.totalSupply = fund.totalSupply.minus(event.params.shareAmount)
-    redeems = fund.redeems
-    redeems.push(redeem.id)
-    fund.redeems = redeems
     fund.save()
 }
 

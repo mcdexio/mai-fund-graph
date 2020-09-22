@@ -45,7 +45,7 @@ dataSources:
         - event: Purchase(indexed address,uint256,uint256)
           handler: handlePurchase
         - event: Redeem(indexed address,uint256,uint256)
-          handler: hanldeRedeem
+          handler: handleRedeem
         - event: SetParameter(bytes32,int256)
           handler: handleSetParameter
         # - event: SetManager(indexed address,indexed address)

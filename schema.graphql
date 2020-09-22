@@ -104,15 +104,3 @@ type FundHourData @entity {
   nextTarget: BigInt
   currentRSI: BigInt
 }
-
-type UserFundHourData @entity {
-  # user address + "-" + fund address + "-" + hourIndex
-  id: ID!
-  hourStartUnix: Int! # unix timestamp for start of hour
-  fund: Fund!
-  user: User!
-  netAssetValuePerShareUnderlying: BigInt!
-
-  netAssetValuePerShareUSD: BigInt!
-
-}
