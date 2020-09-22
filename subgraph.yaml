@@ -51,12 +51,12 @@ dataSources:
         # - event: SetManager(indexed address,indexed address)
           # handler: handleSetManager
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handlehandleTransfer
+          handler: handleTransfer
         - event: IncreaseRedeemingShareBalance(indexed address,uint256)
           handler: handleIncreaseRedeemingShareBalance
         - event: DecreaseRedeemingShareBalance(indexed address,uint256)
           handler: handleDecreaseRedeemingShareBalance
         # - event: UpdateState()
-      blockHandlers:
-        - handler: handleBlock
+      # blockHandlers:
+        # - handler: handleBlock
       file: ./src/fund.ts

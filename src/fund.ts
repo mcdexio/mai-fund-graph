@@ -159,9 +159,6 @@ export function handlePurchase(event: PurchaseEvent): void {
 
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
-    purchases = userInFund.purchases
-    purchases.push(purchase.id)
-    userInFund.purchases = purchases
     userInFund.shareAmount = userInFund.shareAmount.plus(event.params.shareAmount)
     userInFund.assetValue = userInFund.assetValue.plus(event.params.netAssetValuePerShare.toBigDecimal().times(event.params.shareAmount.toBigDecimal()))
     userInFund.save()
@@ -170,9 +167,6 @@ export function handlePurchase(event: PurchaseEvent): void {
     if (fund.totalSupply == ZERO_BI) {
        fund.initNetAssetValuePerShare = event.params.netAssetValuePerShare.toBigDecimal() 
     }
-    purchases = fund.purchases
-    purchases.push(purchase.id)
-    fund.purchases = purchases
     fund.totalSupply = fund.totalSupply.plus(event.params.shareAmount)
     fund.save()
 }

@@ -16,8 +16,9 @@ export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 
-export let FUND_LIST:string[] = ["0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1"]
-export let FUND_RSI_LIST:string[] = ["0x793f396873Ae7394311b0fAb7644aE182CF9093B"]
+// Notice: lowercase
+export let FUND_LIST:string[] = ["0xa8cd84ee8ad8ec1c7ee19e578f2825cde18e56d1"]
+export let FUND_RSI_LIST:string[] = ["0x793f396873ae7394311b0fab7644ae182cf9093b"]
 
 // added ["USDT", "USDC", "DAI"]
 export let USDTokens:string[] = [
@@ -103,22 +104,12 @@ export function fetchUserInFund(userAddress: Address, fundAddress: Address): Use
 
     userInFund = new UserInFund(id)
     userInFund.user = user.id
-    userInFund.id = fund.id
+    userInFund.fund = fund.id
     userInFund.shareAmount = ZERO_BI
     userInFund.redeemingShareAmount = ZERO_BI
     userInFund.assetValue = ZERO_BD
 
-    let newUserInFunds = user.userInFunds
-    newUserInFunds.push(userInFund.id)
-    user.userInFunds = newUserInFunds
-
-    newUserInFunds = fund.userInFunds
-    newUserInFunds.push(userInFund.id)
-    fund.userInFunds = newUserInFunds
-
     userInFund.save()
-    user.save()
-    fund.save()
   }
   return userInFund as UserInFund
 }
@@ -176,7 +167,7 @@ export function fetchPerpetualAddress(address: Address): string {
   let perpetual = ''
   let result = contract.try_perpetual()
   if (!result.reverted) {
-    perpetual = result.value.toString() 
+    perpetual = result.value.toHexString()
   }
   return perpetual
 }
@@ -186,7 +177,7 @@ export function fetchCollateral(address: Address): string {
   let collateral = ''
   let result = contract.try_collateral()
   if (!result.reverted) {
-    collateral = result.value.toString() 
+    collateral = result.value.toHexString()
   }
   return collateral
 }
