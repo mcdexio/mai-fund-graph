@@ -170,7 +170,7 @@ export function handlePurchase(event: PurchaseEvent): void {
     purchase.save()
 
 
-    let userInFund = fetchUserInFund(event.params.trader, event.address)
+    let userInFund = fetchUserInFund(event.params.account, event.address)
     purchases = userInFund.purchases
     purchases.push(purchase.id)
     userInFund.purchases = purchases
@@ -198,11 +198,11 @@ export function handleRedeem(event: RedeemEvent): void {
     redeem.logIndex = event.logIndex
     redeem.save()
 
-    let userInFund = fetchUserInFund(event.params.trader, event.address)
+    let userInFund = fetchUserInFund(event.params.account, event.address)
     userInFund.shareAmount = userInFund.shareAmount.minus(event.params.shareAmount)
-    userInFund.assetValue = userInFund.assetValue.minus(event.params.returnedCollateral)
+    userInFund.assetValue = userInFund.assetValue.minus(event.params.returnedCollateral.toBigDecimal())
     redeems = userInFund.redeems
-    redeems.push(redeems.id)
+    redeems.push(redeem.id)
     userInFund.redeems = redeems
     userInFund.save()
 
@@ -247,7 +247,7 @@ export function handleBlock(block: ethereum.Block): void {
         if(callResult.reverted){
             log.warning("Get try_netAssetValuePerShare reverted at block: {}", [block.number.toString()])
         } else {
-            netAssetValuePerShare = callResult.value
+            netAssetValuePerShare = callResult.value.toBigDecimal()
         }
 
         let perpetual = Perpetual.bind(Address.fromString(fund.perpetual))
@@ -256,7 +256,7 @@ export function handleBlock(block: ethereum.Block): void {
         if(callResult.reverted){
             log.warning("Get try_markPrice reverted at block: {}", [block.number.toString()])
         } else {
-            markPrice = callResult.value
+            markPrice = callResult.value.toBigDecimal()
         }
 
         let netValueInUSD = ZERO_BD
@@ -274,7 +274,7 @@ export function handleBlock(block: ethereum.Block): void {
         blockData.netAssetValuePerShareUnderlying = netValue
 
         // rsi strategy for AutoTradingFund
-        let nextTraget = ZERO_BI
+        let nextTarget = ZERO_BI
         let currentRSI = ZERO_BI
         if (fund.RSITrendingStrategy != "") {
             let strategy = RSITrendingStrategy.bind(Address.fromString(fund.RSITrendingStrategy))
@@ -289,10 +289,10 @@ export function handleBlock(block: ethereum.Block): void {
             if(callResult.reverted){
                 log.warning("Get try_getNextTarget reverted at block: {}", [block.number.toString()])
             } else {
-                nextTraget = callResult.value
+                nextTarget = callResult.value
             }
 
-            blockData.nextTraget = nextTraget
+            blockData.nextTarget = nextTarget
             blockData.currentRSI = currentRSI
         }
         
@@ -313,7 +313,7 @@ export function handleBlock(block: ethereum.Block): void {
             hourData.fund = fund.id
             hourData.netAssetValuePerShareUSD = netValueInUSD
             hourData.netAssetValuePerShareUnderlying = netValue
-            hourData.nextTraget = nextTraget
+            hourData.nextTarget = nextTarget
             hourData.currentRSI = currentRSI
             hourData.save()
         }
