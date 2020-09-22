@@ -5,6 +5,10 @@ import { Fund, User, UserInFund } from '../generated/schema'
 import { ERC20 } from '../generated/mai-fund-graph/ERC20'
 import { ERC20SymbolBytes } from '../generated/mai-fund-graph/ERC20SymbolBytes'
 import { ERC20NameBytes } from '../generated/mai-fund-graph/ERC20NameBytes'
+import { Fund as FundContract } from '../generated/mai-fund-graph/Fund'
+import { Perpetual } from '../generated/mai-fund-graph/Perpetual'
+
+
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export let ZERO_BI = BigInt.fromI32(0)
@@ -13,6 +17,31 @@ export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 
+export let FUND_LIST = ["0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1"]
+const FUND_RSI = {
+  "0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1": "0x793f396873Ae7394311b0fAb7644aE182CF9093B"
+}
+
+// added ["USDT", "USDC", "DAI"]
+const USDTokens = {
+  "0xdac17f958d2ee523a2206206994597c13d831ec7": true,
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": true,
+  "0x6b175474e89094c44da98b954eedeac495271d0f": true
+}
+
+export function isUSDCollateral(collateral: string): boolean {
+    if (USDTokens[collateral]){
+      return true
+    }
+    return false
+}
+
+export function getRSITrendingStrategy(address: Address): string {
+  if (FUND_RSI[address.toHexString()]) {
+    return FUND_RSI[address.toHexString()]
+  }
+  return ""
+}
 
 export function fetchFund(address: Address): Fund {
     let fund = Fund.load(address.toHexString())
@@ -20,8 +49,9 @@ export function fetchFund(address: Address): Fund {
       fund = new Fund(address.toHexString())
       fund.symbol = fetchTokenSymbol(address)
       fund.name = fetchTokenName(address)
-      fund.perpetualAddress = "0x4ea47ffe24a8e2435e6a72ab451276224ca6cebb"
-      fund.totalAmount = ZERO_BI
+      fund.perpetual = fetchPerpetualAddress(address)
+      fund.collateral = fetchCollateral(address)
+      fund.RSITrendingStrategy = getRSITrendingStrategy(address)
     
       // contract state: Normal, Emergency, Shutdown
       fund.state = 0
@@ -71,15 +101,15 @@ export function fetchUserInFund(userAddress: Address, fundAddress: Address): Use
     .concat(fundAddress.toHexString())
   let userInFund = UserInFund.load(id)
   if (userInFund === null) {
-    let user = User.load(userAddress.toHexString())
-    let fund = Fund.load(fundAddress.toHexString())
+    let user = fetchUser(userAddress)
+    let fund = fetchFund(fundAddress)
 
     userInFund = new UserInFund(id)
     userInFund.user = user.id
     userInFund.id = fund.id
     userInFund.shareAmount = ZERO_BI
     userInFund.redeemingShareAmount = ZERO_BI
-    userInFund.avgNetAssetValuePerShare = ZERO_BD
+    userInFund.assetValue = ZERO_BD
     userInFund.purchases = []
     userInFund.redeems = []
 
@@ -97,8 +127,6 @@ export function fetchUserInFund(userAddress: Address, fundAddress: Address): Use
   }
   return userInFund as UserInFund
 }
-
-export function fetchPurchase()
 
 export function isNullEthValue(value: string): boolean {
   return value == '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -146,4 +174,24 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
   }
 
   return symbolValue
+}
+
+export function fetchPerpetualAddress(address: Address): Address {
+  let contract = FundContract.bind(address)
+  let perpetual = ''
+  let result = contract.try_perpetual()
+  if (!result.reverted) {
+    perpetual = result.value.toString() 
+  }
+  return perpetual
+}
+
+export function fetchCollateral(address: Address): Address {
+  let contract = FundContract.bind(address)
+  let collateral = ''
+  let result = contract.try_collateral()
+  if (!result.reverted) {
+    collateral = result.value.toString() 
+  }
+  return collateral
 }

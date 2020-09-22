@@ -37,6 +37,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: RSITrendingStrategy
+          file: ./abis/RSITrendingStrategy.json
       eventHandlers:
         - event: Purchase(indexed address,uint256,uint256)
           handler: handlePurchase
@@ -52,6 +54,7 @@ dataSources:
           handler: handleIncreaseRedeemingShareBalance
         - event: DecreaseRedeemingShareBalance(indexed address,uint256)
           handler: handleDecreaseRedeemingShareBalance
+        # - event: UpdateState()
       blockHandlers:
         - handler: handleBlock
       file: ./src/fund.ts
