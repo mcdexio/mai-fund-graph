@@ -108,6 +108,9 @@ type FundBlockData @entity {
   timestamp: BigInt!
   blockNumber: BigInt!
   fund: Fund!
+  netAssetValuePerShare: BigDecimal!
+  markPrice: BigDecimal!
+  
   netAssetValuePerShareUnderlying: BigDecimal!
   netAssetValuePerShareUSD: BigDecimal!
   # for auto trading fund rsi strategy

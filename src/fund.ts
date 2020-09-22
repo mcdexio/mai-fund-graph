@@ -216,70 +216,11 @@ export function handleBlock(block: ethereum.Block): void {
             .concat(block.number.toString())
         )
 
-        let fund = Fund.load(FUND_LIST[i])
+        let fund = fetchFund(Address.fromString(FUND_LIST[i]))
 
         blockData.timestamp = block.timestamp
         blockData.blockNumber = block.number
         blockData.fund = fund.id
-
-        let fundContract = FundContract.bind(Address.fromString(FUND_LIST[i]))
-        let netAssetValuePerShare = ZERO_BD
-
-        let callResult = fundContract.try_netAssetValuePerShare()
-        if(callResult.reverted){
-            log.warning("Get try_netAssetValuePerShare reverted at block: {}", [block.number.toString()])
-        } else {
-            netAssetValuePerShare = callResult.value.toBigDecimal()
-        }
-
-        let perpetual = Perpetual.bind(Address.fromString(fund.perpetual))
-        let markPrice = ONE_BD
-        callResult = perpetual.try_markPrice()
-        if(callResult.reverted){
-            log.warning("Get try_markPrice reverted at block: {}", [block.number.toString()])
-        } else {
-            markPrice = callResult.value.toBigDecimal()
-        }
-
-        let netValueInUSD = ZERO_BD
-        let netValue = ZERO_BD
-
-        if (isUSDCollateral(fund.collateral)) {
-            netValueInUSD = netAssetValuePerShare
-            netValue = netAssetValuePerShare.times(markPrice)
-        } else {
-            netValueInUSD = netAssetValuePerShare.div(markPrice)
-            netValue = netAssetValuePerShare
-        }
-
-        blockData.netAssetValuePerShareUSD = netValueInUSD
-        blockData.netAssetValuePerShareUnderlying = netValue
-
-        // rsi strategy for AutoTradingFund
-        let nextTarget = ZERO_BI
-        let currentRSI = ZERO_BI
-        if (fund.RSITrendingStrategy != "") {
-            let strategy = RSITrendingStrategy.bind(Address.fromString(fund.RSITrendingStrategy))
-            callResult = strategy.try_getCurrentRSI()
-            if(callResult.reverted){
-                log.warning("Get try_getCurrentRSI reverted at block: {}", [block.number.toString()])
-            } else {
-                currentRSI = callResult.value
-            }
-
-            callResult = strategy.try_getNextTarget()
-            if(callResult.reverted){
-                log.warning("Get try_getNextTarget reverted at block: {}", [block.number.toString()])
-            } else {
-                nextTarget = callResult.value
-            }
-
-            blockData.nextTarget = nextTarget
-            blockData.currentRSI = currentRSI
-        }
-        
-        blockData.save()
-
 
         // hour data
         let timestamp = block.timestamp.toI32()
@@ -290,15 +231,69 @@ export function handleBlock(block: ethereum.Block): void {
         .concat(BigInt.fromI32(hourIndex).toString())
         let fundHourData = FundHourData.load(hourFundID)
         if (fundHourData == null) {
-            let hourData = new FundHourData(hourFundID)
-            hourData.hourStartUnix = hourStartUnix
-            hourData.fund = fund.id
-            hourData.netAssetValuePerShareUSD = netValueInUSD
-            hourData.netAssetValuePerShareUnderlying = netValue
-            hourData.nextTarget = nextTarget
-            hourData.currentRSI = currentRSI
-            hourData.save()
+            fundHourData = new FundHourData(hourFundID)
+            let fundContract = FundContract.bind(Address.fromString(FUND_LIST[i]))
+            let netAssetValuePerShare = ZERO_BD
+
+            let callResult = fundContract.try_netAssetValuePerShare()
+            if(callResult.reverted){
+                log.warning("Get try_netAssetValuePerShare reverted at block: {}", [block.number.toString()])
+            } else {
+                netAssetValuePerShare = callResult.value.toBigDecimal()
+            }
+
+            let perpetual = Perpetual.bind(Address.fromString(fund.perpetual))
+            let markPrice = ONE_BD
+            callResult = perpetual.try_markPrice()
+            if(callResult.reverted){
+                log.warning("Get try_markPrice reverted at block: {}", [block.number.toString()])
+            } else {
+                markPrice = callResult.value.toBigDecimal()
+            }
+
+            let netValueInUSD = ZERO_BD
+            let netValue = ZERO_BD
+
+            if (isUSDCollateral(fund.collateral)) {
+                netValueInUSD = netAssetValuePerShare
+                netValue = netAssetValuePerShare.times(markPrice)
+            } else {
+                netValueInUSD = netAssetValuePerShare.div(markPrice)
+                netValue = netAssetValuePerShare
+            }
+            // rsi strategy for AutoTradingFund
+            let nextTarget = ZERO_BI
+            let currentRSI = ZERO_BI
+            if (fund.RSITrendingStrategy != "") {
+                let strategy = RSITrendingStrategy.bind(Address.fromString(fund.RSITrendingStrategy))
+                callResult = strategy.try_getCurrentRSI()
+                if(callResult.reverted){
+                    log.warning("Get try_getCurrentRSI reverted at block: {}", [block.number.toString()])
+                } else {
+                    currentRSI = callResult.value
+                }
+
+                callResult = strategy.try_getNextTarget()
+                if(callResult.reverted){
+                    log.warning("Get try_getNextTarget reverted at block: {}", [block.number.toString()])
+                } else {
+                    nextTarget = callResult.value
+                }
+
+            }
+            fundHourData.hourStartUnix = hourStartUnix
+            fundHourData.netAssetValuePerShareUSD = netValueInUSD
+            fundHourData.netAssetValuePerShareUnderlying = netValue
+            fundHourData.nextTarget = nextTarget
+            fundHourData.currentRSI = currentRSI
+            fundHourData.save()
         }
+
+        blockData.nextTarget = fundHourData.nextTarget
+        blockData.currentRSI = fundHourData.currentRSI
+        blockData.netAssetValuePerShareUSD = fundHourData.netAssetValuePerShareUSD
+        blockData.netAssetValuePerShareUnderlying = fundHourData.netAssetValuePerShareUnderlying
+        blockData.save()
     }
 }
   
