@@ -27,7 +27,7 @@ import {
     fetchUserInFund,
     ZERO_BI,
     ZERO_BD,
-    ONE_BD,
+    ONE_BI,
     ADDRESS_ZERO,
     FUND_LIST,
     isUSDCollateral
@@ -239,7 +239,7 @@ export function handleBlock(block: ethereum.Block): void {
             }
 
             let perpetual = Perpetual.bind(Address.fromString(fund.perpetual))
-            let markPrice = ONE_BD
+            let markPrice = ONE_BI
             callResult = perpetual.try_markPrice()
             if(callResult.reverted){
                 log.warning("Get try_markPrice reverted at block: {}", [block.number.toString()])
