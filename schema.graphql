@@ -20,7 +20,9 @@ type UserInFund @entity {
   fund: Fund!
   shareAmount: BigInt!
   redeemingShareAmount: BigInt!
-  assetValue: BigDecimal!
+  totalPurchaseValue: BigInt!
+  totalRedeemValue: BigInt!
+  assetValue: BigInt!
 
   purchases: [Purchase!]! @derivedFrom(field: "userInFund")
   redeems: [Redeem!]! @derivedFrom(field: "userInFund")
@@ -57,7 +59,8 @@ type Fund @entity {
   manager: String
 
   totalSupply: BigInt!
-  initNetAssetValuePerShare: BigDecimal!
+  initNetAssetValuePerShare: BigInt!
+  initTimestamp: BigInt!
   
   userInFunds: [UserInFund!]! @derivedFrom(field:"fund")
   purchases: [Purchase!]! @derivedFrom(field: "fund")
@@ -95,25 +98,21 @@ type FundHourData @entity {
   id: ID!
   hourStartUnix: Int! # unix timestamp for start of hour
   fund: Fund!
-  netAssetValuePerShareUnderlying: BigDecimal!
-  netAssetValuePerShareUSD: BigDecimal!
+  netAssetValuePerShareUnderlying: BigInt!
+  netAssetValuePerShareUSD: BigInt!
   # for auto trading fund rsi strategy
   nextTarget: BigInt
   currentRSI: BigInt
 }
 
-type FundBlockData @entity {
-  # fund address + "-" + blocknumber
+type UserFundHourData @entity {
+  # user address + "-" + fund address + "-" + hourIndex
   id: ID!
-  timestamp: BigInt!
-  blockNumber: BigInt!
+  hourStartUnix: Int! # unix timestamp for start of hour
   fund: Fund!
-  netAssetValuePerShare: BigDecimal!
-  markPrice: BigDecimal!
-  
-  netAssetValuePerShareUnderlying: BigDecimal!
-  netAssetValuePerShareUSD: BigDecimal!
-  # for auto trading fund rsi strategy
-  nextTarget: BigInt
-  currentRSI: BigInt
+  user: User!
+  netAssetValuePerShareUnderlying: BigInt!
+
+  netAssetValuePerShareUSD: BigInt!
+
 }

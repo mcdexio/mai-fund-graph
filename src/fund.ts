@@ -33,7 +33,7 @@ import {
     isUSDCollateral
 } from './utils'
 
-import { Fund, Purchase, Redeem, Transaction, FundBlockData, FundHourData } from '../generated/schema';
+import { Fund, Purchase, Redeem, Transaction, FundHourData } from '../generated/schema';
 
 export function handleSetParameter(event: SetParameterEvent): void {
     let fund = fetchFund(event.address)
@@ -137,7 +137,7 @@ export function handleTransfer(event:TransferEvent): void {
 
     // swap
     if (from.toHexString() != ADDRESS_ZERO && to.toHexString() != ADDRESS_ZERO) {
-        let swapedAssetValue = userInFundFrom.assetValue.div(userInFundFrom.shareAmount.toBigDecimal()).times(userInFundFrom.shareAmount.minus(event.params.value).toBigDecimal())
+        let swapedAssetValue = userInFundFrom.assetValue.div(userInFundFrom.shareAmount).times(userInFundFrom.shareAmount.minus(event.params.value))
         userInFundFrom.shareAmount = userInFundFrom.shareAmount.minus(event.params.value)
         userInFundFrom.assetValue = userInFundFrom.assetValue.minus(swapedAssetValue)
         userInFundFrom.save()
@@ -160,12 +160,14 @@ export function handlePurchase(event: PurchaseEvent): void {
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
     userInFund.shareAmount = userInFund.shareAmount.plus(event.params.shareAmount)
-    userInFund.assetValue = userInFund.assetValue.plus(event.params.netAssetValuePerShare.toBigDecimal().times(event.params.shareAmount.toBigDecimal()))
+    userInFund.totalPurchaseValue = userInFund.totalPurchaseValue.plus(event.params.netAssetValuePerShare.times(event.params.shareAmount))
+    userInFund.assetValue = userInFund.assetValue.plus(event.params.netAssetValuePerShare.times(event.params.shareAmount))
     userInFund.save()
 
     let fund = fetchFund(event.address)
     if (fund.totalSupply == ZERO_BI) {
-       fund.initNetAssetValuePerShare = event.params.netAssetValuePerShare.toBigDecimal() 
+       fund.initNetAssetValuePerShare = event.params.netAssetValuePerShare
+       fund.initTimestamp = event.block.timestamp
     }
     fund.totalSupply = fund.totalSupply.plus(event.params.shareAmount)
     fund.save()
@@ -182,7 +184,9 @@ export function handleRedeem(event: RedeemEvent): void {
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
     userInFund.shareAmount = userInFund.shareAmount.minus(event.params.shareAmount)
-    userInFund.assetValue = userInFund.assetValue.minus(event.params.returnedCollateral.toBigDecimal())
+    userInFund.assetValue = userInFund.assetValue.minus(event.params.returnedCollateral)
+    userInFund.totalRedeemValue = userInFund.totalRedeemValue.plus(event.params.returnedCollateral)
+
     redeems = userInFund.redeems
     redeems.push(redeem.id)
     userInFund.redeems = redeems
@@ -210,17 +214,7 @@ export function handleDecreaseRedeemingShareBalance(event: DecreaseRedeemingShar
 
 export function handleBlock(block: ethereum.Block): void {
     for (let i = 0; i < FUND_LIST.length; i++) {
-        let blockData = new FundBlockData(
-            FUND_LIST[i]
-            .concat('-')
-            .concat(block.number.toString())
-        )
-
         let fund = fetchFund(Address.fromString(FUND_LIST[i]))
-
-        blockData.timestamp = block.timestamp
-        blockData.blockNumber = block.number
-        blockData.fund = fund.id
 
         // hour data
         let timestamp = block.timestamp.toI32()
@@ -232,6 +226,8 @@ export function handleBlock(block: ethereum.Block): void {
         let fundHourData = FundHourData.load(hourFundID)
         if (fundHourData == null) {
             fundHourData = new FundHourData(hourFundID)
+            fundHourData.fund = fund.id
+            fundHourData.hourStartUnix = hourStartUnix
             let fundContract = FundContract.bind(Address.fromString(FUND_LIST[i]))
             let netAssetValuePerShare = ZERO_BD
 
@@ -239,7 +235,7 @@ export function handleBlock(block: ethereum.Block): void {
             if(callResult.reverted){
                 log.warning("Get try_netAssetValuePerShare reverted at block: {}", [block.number.toString()])
             } else {
-                netAssetValuePerShare = callResult.value.toBigDecimal()
+                netAssetValuePerShare = callResult.value
             }
 
             let perpetual = Perpetual.bind(Address.fromString(fund.perpetual))
@@ -248,7 +244,7 @@ export function handleBlock(block: ethereum.Block): void {
             if(callResult.reverted){
                 log.warning("Get try_markPrice reverted at block: {}", [block.number.toString()])
             } else {
-                markPrice = callResult.value.toBigDecimal()
+                markPrice = callResult.value
             }
 
             let netValueInUSD = ZERO_BD
@@ -281,19 +277,12 @@ export function handleBlock(block: ethereum.Block): void {
                 }
 
             }
-            fundHourData.hourStartUnix = hourStartUnix
             fundHourData.netAssetValuePerShareUSD = netValueInUSD
             fundHourData.netAssetValuePerShareUnderlying = netValue
             fundHourData.nextTarget = nextTarget
             fundHourData.currentRSI = currentRSI
             fundHourData.save()
         }
-
-        blockData.nextTarget = fundHourData.nextTarget
-        blockData.currentRSI = fundHourData.currentRSI
-        blockData.netAssetValuePerShareUSD = fundHourData.netAssetValuePerShareUSD
-        blockData.netAssetValuePerShareUnderlying = fundHourData.netAssetValuePerShareUnderlying
-        blockData.save()
     }
 }
   

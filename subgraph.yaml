@@ -10,7 +10,7 @@ dataSources:
     source:
       address: '0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1'
       abi: Fund
-      startBlock: 44100
+      startBlock: 75100
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

@@ -76,7 +76,8 @@ export function fetchFund(address: Address): Fund {
       fund.manager = ""
 
       fund.totalSupply = ZERO_BI
-      fund.initNetAssetValuePerShare = ZERO_BD
+      fund.initNetAssetValuePerShare = ZERO_BI
+      fund.initTimestamp = ZERO_BI
 
       fund.save()
     }
@@ -107,7 +108,9 @@ export function fetchUserInFund(userAddress: Address, fundAddress: Address): Use
     userInFund.fund = fund.id
     userInFund.shareAmount = ZERO_BI
     userInFund.redeemingShareAmount = ZERO_BI
-    userInFund.assetValue = ZERO_BD
+    userInFund.totalPurchaseValue = ZERO_BI
+    userInFund.totalRedeemValue = ZERO_BI
+    userInFund.assetValue = ZERO_BI
 
     userInFund.save()
   }
