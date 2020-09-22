@@ -37,6 +37,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: Perpetual
+          file: ./abis/Perpetual.json
         - name: RSITrendingStrategy
           file: ./abis/RSITrendingStrategy.json
       eventHandlers:
@@ -46,8 +48,8 @@ dataSources:
           handler: hanldeRedeem
         - event: SetParameter(bytes32,int256)
           handler: handleSetParameter
-        - event: SetManager(indexed address,indexed address)
-          handler: handleSetManager
+        # - event: SetManager(indexed address,indexed address)
+          # handler: handleSetManager
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handlehandleTransfer
         - event: IncreaseRedeemingShareBalance(indexed address,uint256)
