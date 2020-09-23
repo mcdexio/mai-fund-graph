@@ -23,7 +23,7 @@ type UserInFund @entity {
   totalPurchaseValue: BigInt!
   totalRedeemValue: BigInt!
   assetValue: BigInt!
-  fisrtPurchaseTime: Int!
+  firstPurchaseTime: Int!
 
   purchases: [Purchase!]! @derivedFrom(field: "userInFund")
   redeems: [Redeem!]! @derivedFrom(field: "userInFund")
