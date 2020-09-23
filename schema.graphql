@@ -1,7 +1,7 @@
 type Transaction @entity {
   # transaction hash
   id: ID!
-  timestamp: BigInt!
+  timestamp: Int!
   blockNumber: BigInt!
   purchases: [Purchase]!
   redeems: [Redeem]!
@@ -60,7 +60,7 @@ type Fund @entity {
 
   totalSupply: BigInt!
   initNetAssetValuePerShare: BigInt!
-  initTimestamp: BigInt!
+  initTimestamp: Int!
   
   userInFunds: [UserInFund!]! @derivedFrom(field:"fund")
   purchases: [Purchase!]! @derivedFrom(field: "fund")
