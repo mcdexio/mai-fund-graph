@@ -103,6 +103,7 @@ type Redeem @entity {
   type: Int! # 0: request, 1: cancel
   fund: Fund!
   user: User!
+  transactionHash: String!
   userInFund: UserInFund!
   shareAmount: BigInt!
   slippage: BigInt

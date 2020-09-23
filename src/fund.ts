@@ -214,15 +214,17 @@ export function handleRequestToRedeem(event: RequestToRedeemEvent): void {
     let userInFund = fetchUserInFund(event.params.account, event.address)
     let fund = fetchFund(event.address)
     let user = fetchUser(event.params.account)
+    let transactionHash = event.transaction.hash.toHexString()
     let redeem = new Redeem(
           event.params.account
           .toHexString()
           .concat('-')
-          .concat(event.transaction.hash.toHexString())
+          .concat(transactionHash)
           .concat('-')
           .concat(event.logIndex.toString())
     )
     redeem.timestamp = event.block.timestamp.toI32()
+    redeem.transactionHash = transactionHash
     redeem.fund = fund.id
     redeem.user = user.id
     redeem.type = 0
@@ -236,15 +238,17 @@ export function handleCancelRedeeming(event:CancelRedeemingEvent): void {
     let userInFund = fetchUserInFund(event.params.account, event.address)
     let fund = fetchFund(event.address)
     let user = fetchUser(event.params.account)
+    let transactionHash = event.transaction.hash.toHexString()
     let redeem = new Redeem(
           event.params.account
           .toHexString()
           .concat('-')
-          .concat(event.transaction.hash.toHexString())
+          .concat(transactionHash)
           .concat('-')
           .concat(event.logIndex.toString())
     )
     redeem.timestamp = event.block.timestamp.toI32()
+    redeem.transactionHash = transactionHash
     redeem.fund = fund.id
     redeem.user = user.id
     redeem.type = 1
