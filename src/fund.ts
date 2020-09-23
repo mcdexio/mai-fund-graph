@@ -42,7 +42,7 @@ export function handleSetParameter(event: SetParameterEvent): void {
     let fund = fetchFund(event.address)
     let key = event.params.key.toString()
     if (key == "cap") {
-        fund.cap = event.params.value
+        fund.cap = event.params.value.toBigDecimal()
     } else if (key == "redeemingLockPeriod") {
         fund.redeemingLockPeriod = event.params.value.toBigDecimal()
     } else if (key == "entranceFeeRate") {
@@ -156,13 +156,13 @@ export function handlePurchase(event: PurchaseEvent): void {
     let purchases = transaction.purchases
     let purchase = Purchase.load(purchases[purchases.length - 1])
 
-    purchase.netAssetValuePerShare = event.params.netAssetValuePerShare
+    purchase.netAssetValuePerShare = event.params.netAssetValuePerShare.toBigDecimal()
     purchase.logIndex = event.logIndex
     purchase.save()
 
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
-    userInFund.shareAmount = userInFund.shareAmount.plus(event.params.shareAmount)
+    userInFund.shareAmount = userInFund.shareAmount.plus(event.params.shareAmount.toBigDecimal())
     userInFund.totalPurchaseValue = userInFund.totalPurchaseValue.plus(event.params.netAssetValuePerShare.toBigDecimal().times(event.params.shareAmount.toBigDecimal()))
     userInFund.assetValue = userInFund.assetValue.plus(event.params.netAssetValuePerShare.toBigDecimal().times(event.params.shareAmount.toBigDecimal()))
     if (userInFund.firstPurchaseTime == 0) {
@@ -171,7 +171,7 @@ export function handlePurchase(event: PurchaseEvent): void {
     userInFund.save()
 
     let fund = fetchFund(event.address)
-    if (fund.totalSupply == ZERO_BI) {
+    if (fund.totalSupply == ZERO_BD) {
        fund.initNetAssetValuePerShare = event.params.netAssetValuePerShare.toBigDecimal()
        fund.initTimestamp = event.block.timestamp.toI32()
     }
@@ -184,7 +184,7 @@ export function handleRedeem(event: RedeemEvent): void {
     let redeemeds = transaction.redeemeds
     let redeemed = Redeemed.load(redeemeds[redeemeds.length - 1])
 
-    redeemed.returnedCollateral = event.params.returnedCollateral
+    redeemed.returnedCollateral = event.params.returnedCollateral.toBigDecimal()
     redeemed.logIndex = event.logIndex
     redeemed.save()
 
