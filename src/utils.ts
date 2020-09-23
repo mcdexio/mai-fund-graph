@@ -59,24 +59,24 @@ export function fetchFund(address: Address): Fund {
       fund.state = 0
     
       // contract param
-      fund.redeemingLockPeriod = ZERO_BI
-      fund.entranceFeeRate = ZERO_BI
-      fund.streamingFeeRate = ZERO_BI
-      fund.performanceFeeRate = ZERO_BI
-      fund.globalRedeemingSlippage = ZERO_BI
-      fund.cap = ZERO_BI
-      fund.drawdownHighWaterMark = ZERO_BI
-      fund.leverageHighWaterMark = ZERO_BI
+      fund.redeemingLockPeriod = ZERO_BD
+      fund.entranceFeeRate = ZERO_BD
+      fund.streamingFeeRate = ZERO_BD
+      fund.performanceFeeRate = ZERO_BD
+      fund.globalRedeemingSlippage = ZERO_BD
+      fund.cap = ZERO_BD
+      fund.drawdownHighWaterMark = ZERO_BD
+      fund.leverageHighWaterMark = ZERO_BD
     
       // AutoTrading fund
-      fund.rebalanceSlippage = ZERO_BI
-      fund.rebalanceTolerance = ZERO_BI
+      fund.rebalanceSlippage = ZERO_BD
+      fund.rebalanceTolerance = ZERO_BD
     
       // SocialTrading fund
       fund.manager = ""
 
-      fund.totalSupply = ZERO_BI
-      fund.initNetAssetValuePerShare = ZERO_BI
+      fund.totalSupply = ZERO_BD
+      fund.initNetAssetValuePerShare = ZERO_BD
       fund.initTimestamp = 0
 
       fund.save()
@@ -106,11 +106,12 @@ export function fetchUserInFund(userAddress: Address, fundAddress: Address): Use
     userInFund = new UserInFund(id)
     userInFund.user = user.id
     userInFund.fund = fund.id
-    userInFund.shareAmount = ZERO_BI
-    userInFund.redeemingShareAmount = ZERO_BI
-    userInFund.totalPurchaseValue = ZERO_BI
-    userInFund.totalRedeemValue = ZERO_BI
-    userInFund.assetValue = ZERO_BI
+    userInFund.shareAmount = ZERO_BD
+    userInFund.redeemingShareAmount = ZERO_BD
+    userInFund.totalPurchaseValue = ZERO_BD
+    userInFund.totalRedeemValue = ZERO_BD
+    userInFund.totalRedeemedValue = ZERO_BD
+    userInFund.assetValue = ZERO_BD
     userInFund.firstPurchaseTime = 0
 
     userInFund.save()

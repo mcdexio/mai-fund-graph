@@ -30,6 +30,7 @@ import {
     ZERO_BI,
     ZERO_BD,
     ONE_BI,
+    ONE_BD,
     ADDRESS_ZERO,
     FUND_LIST,
     isUSDCollateral
@@ -43,23 +44,23 @@ export function handleSetParameter(event: SetParameterEvent): void {
     if (key == "cap") {
         fund.cap = event.params.value
     } else if (key == "redeemingLockPeriod") {
-        fund.redeemingLockPeriod = event.params.value
+        fund.redeemingLockPeriod = event.params.value.toBigDecimal()
     } else if (key == "entranceFeeRate") {
-        fund.entranceFeeRate = event.params.value
+        fund.entranceFeeRate = event.params.value.toBigDecimal()
     } else if (key == "streamingFeeRate") {
-        fund.streamingFeeRate = event.params.value
+        fund.streamingFeeRate = event.params.value.toBigDecimal()
     } else if (key == "performanceFeeRate") {
-        fund.performanceFeeRate = event.params.value
+        fund.performanceFeeRate = event.params.value.toBigDecimal()
     } else if (key == "globalRedeemingSlippage") {
-        fund.globalRedeemingSlippage = event.params.value
+        fund.globalRedeemingSlippage = event.params.value.toBigDecimal()
     } else if (key == "drawdownHighWaterMark") {
-        fund.drawdownHighWaterMark = event.params.value
+        fund.drawdownHighWaterMark = event.params.value.toBigDecimal()
     } else if (key == "leverageHighWaterMark") {
-        fund.leverageHighWaterMark = event.params.value
+        fund.leverageHighWaterMark = event.params.value.toBigDecimal()
     } else if (key == "rebalanceSlippage") {
-        fund.rebalanceSlippage = event.params.value
+        fund.rebalanceSlippage = event.params.value.toBigDecimal()
     } else if (key == "rebalanceTolerance") {
-        fund.rebalanceTolerance = event.params.value
+        fund.rebalanceTolerance = event.params.value.toBigDecimal()
     }
     fund.save()
 }
@@ -104,7 +105,7 @@ export function handleTransfer(event:TransferEvent): void {
             purchase.fund = fund.id
             purchase.to = userTo.id
             purchase.userInFund = userInFundTo.id
-            purchase.shareAmount = event.params.value
+            purchase.shareAmount = event.params.value.toBigDecimal()
             purchase.save()
 
             purchases.push(purchase.id)
@@ -128,7 +129,7 @@ export function handleTransfer(event:TransferEvent): void {
             redeemed.fund = fund.id
             redeemed.from = userFrom.id
             redeemed.userInFund = userInFundFrom.id
-            redeemed.shareAmount = event.params.value
+            redeemed.shareAmount = event.params.value.toBigDecimal()
             redeemed.save()
 
             redeemeds.push(redeemed.id)
@@ -139,12 +140,12 @@ export function handleTransfer(event:TransferEvent): void {
 
     // swap
     if (from.toHexString() != ADDRESS_ZERO && to.toHexString() != ADDRESS_ZERO) {
-        let swapedAssetValue = userInFundFrom.assetValue.div(userInFundFrom.shareAmount).times(userInFundFrom.shareAmount.minus(event.params.value))
-        userInFundFrom.shareAmount = userInFundFrom.shareAmount.minus(event.params.value)
+        let swapedAssetValue = userInFundFrom.assetValue.div(userInFundFrom.shareAmount).times(userInFundFrom.shareAmount.minus(event.params.value.toBigDecimal()))
+        userInFundFrom.shareAmount = userInFundFrom.shareAmount.minus(event.params.value.toBigDecimal())
         userInFundFrom.assetValue = userInFundFrom.assetValue.minus(swapedAssetValue)
         userInFundFrom.save()
     
-        userInFundTo.shareAmount = userInFundTo.shareAmount.plus(event.params.value)
+        userInFundTo.shareAmount = userInFundTo.shareAmount.plus(event.params.value.toBigDecimal())
         userInFundTo.assetValue = userInFundTo.assetValue.plus(swapedAssetValue)
         userInFundTo.save()
     }
@@ -162,8 +163,8 @@ export function handlePurchase(event: PurchaseEvent): void {
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
     userInFund.shareAmount = userInFund.shareAmount.plus(event.params.shareAmount)
-    userInFund.totalPurchaseValue = userInFund.totalPurchaseValue.plus(event.params.netAssetValuePerShare.times(event.params.shareAmount))
-    userInFund.assetValue = userInFund.assetValue.plus(event.params.netAssetValuePerShare.times(event.params.shareAmount))
+    userInFund.totalPurchaseValue = userInFund.totalPurchaseValue.plus(event.params.netAssetValuePerShare.toBigDecimal().times(event.params.shareAmount.toBigDecimal()))
+    userInFund.assetValue = userInFund.assetValue.plus(event.params.netAssetValuePerShare.toBigDecimal().times(event.params.shareAmount.toBigDecimal()))
     if (userInFund.firstPurchaseTime == 0) {
         userInFund.firstPurchaseTime = event.block.timestamp.toI32()
     }
@@ -171,10 +172,10 @@ export function handlePurchase(event: PurchaseEvent): void {
 
     let fund = fetchFund(event.address)
     if (fund.totalSupply == ZERO_BI) {
-       fund.initNetAssetValuePerShare = event.params.netAssetValuePerShare
+       fund.initNetAssetValuePerShare = event.params.netAssetValuePerShare.toBigDecimal()
        fund.initTimestamp = event.block.timestamp.toI32()
     }
-    fund.totalSupply = fund.totalSupply.plus(event.params.shareAmount)
+    fund.totalSupply = fund.totalSupply.plus(event.params.shareAmount.toBigDecimal())
     fund.save()
 }
 
@@ -188,25 +189,25 @@ export function handleRedeem(event: RedeemEvent): void {
     redeemed.save()
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
-    userInFund.shareAmount = userInFund.shareAmount.minus(event.params.shareAmount)
-    userInFund.assetValue = userInFund.assetValue.minus(event.params.returnedCollateral)
-    userInFund.totalRedeemValue = userInFund.totalRedeemValue.plus(event.params.returnedCollateral)
+    userInFund.shareAmount = userInFund.shareAmount.minus(event.params.shareAmount.toBigDecimal())
+    userInFund.assetValue = userInFund.assetValue.minus(event.params.returnedCollateral.toBigDecimal())
+    userInFund.totalRedeemedValue = userInFund.totalRedeemedValue.plus(event.params.returnedCollateral.toBigDecimal())
     userInFund.save()
 
     let fund = fetchFund(event.address)
-    fund.totalSupply = fund.totalSupply.minus(event.params.shareAmount)
+    fund.totalSupply = fund.totalSupply.minus(event.params.shareAmount.toBigDecimal())
     fund.save()
 }
 
 export function handleIncreaseRedeemingShareBalance(event: IncreaseRedeemingShareBalanceEvent): void {
     let userInFund = fetchUserInFund(event.params.trader, event.address)
-    userInFund.redeemingShareAmount = userInFund.redeemingShareAmount.plus(event.params.amount)
+    userInFund.redeemingShareAmount = userInFund.redeemingShareAmount.plus(event.params.amount.toBigDecimal())
     userInFund.save()
 }
 
 export function handleDecreaseRedeemingShareBalance(event: DecreaseRedeemingShareBalanceEvent): void {
     let userInFund = fetchUserInFund(event.params.trader, event.address)
-    userInFund.redeemingShareAmount = userInFund.redeemingShareAmount.minus(event.params.amount)
+    userInFund.redeemingShareAmount = userInFund.redeemingShareAmount.minus(event.params.amount.toBigDecimal())
     userInFund.save()
 }
 
@@ -229,9 +230,11 @@ export function handleRequestToRedeem(event: RequestToRedeemEvent): void {
     redeem.user = user.id
     redeem.type = 0
     redeem.userInFund = userInFund.id
-    redeem.shareAmount = event.params.shareAmount
-    redeem.slippage = event.params.slippage
+    redeem.shareAmount = event.params.shareAmount.toBigDecimal()
+    redeem.slippage = event.params.slippage.toBigDecimal()
     redeem.save()
+    userInFund.totalRedeemValue = userInFund.totalRedeemValue.plus(redeem.shareAmount)
+    userInFund.save()
 }
 
 export function handleCancelRedeeming(event:CancelRedeemingEvent): void {
@@ -253,8 +256,10 @@ export function handleCancelRedeeming(event:CancelRedeemingEvent): void {
     redeem.user = user.id
     redeem.type = 1
     redeem.userInFund = userInFund.id
-    redeem.shareAmount = event.params.shareAmount
+    redeem.shareAmount = event.params.shareAmount.toBigDecimal()
     redeem.save()
+    userInFund.totalRedeemValue = userInFund.totalRedeemValue.minus(redeem.shareAmount)
+    userInFund.save()
 }
 
 export function handleBlock(block: ethereum.Block): void {
@@ -274,26 +279,26 @@ export function handleBlock(block: ethereum.Block): void {
             fundHourData.fund = fund.id
             fundHourData.hourStartUnix = hourStartUnix
             let fundContract = FundContract.bind(Address.fromString(FUND_LIST[i]))
-            let netAssetValuePerShare = ZERO_BI
+            let netAssetValuePerShare = ZERO_BD
 
             let callResult = fundContract.try_netAssetValuePerShare()
             if(callResult.reverted){
                 log.warning("Get try_netAssetValuePerShare reverted at block: {}", [block.number.toString()])
             } else {
-                netAssetValuePerShare = callResult.value
+                netAssetValuePerShare = callResult.value.toBigDecimal()
             }
 
             let perpetual = Perpetual.bind(Address.fromString(fund.perpetual))
-            let markPrice = ONE_BI
+            let markPrice = ONE_BD
             callResult = perpetual.try_markPrice()
             if(callResult.reverted){
                 log.warning("Get try_markPrice reverted at block: {}", [block.number.toString()])
             } else {
-                markPrice = callResult.value
+                markPrice = callResult.value.toBigDecimal()
             }
 
-            let netValueInUSD = ZERO_BI
-            let netValue = ZERO_BI
+            let netValueInUSD = ZERO_BD
+            let netValue = ZERO_BD
 
             if (isUSDCollateral(fund.collateral)) {
                 netValueInUSD = netAssetValuePerShare
@@ -303,22 +308,22 @@ export function handleBlock(block: ethereum.Block): void {
                 netValue = netAssetValuePerShare
             }
             // rsi strategy for AutoTradingFund
-            let nextTarget = ZERO_BI
-            let currentRSI = ZERO_BI
+            let nextTarget = ZERO_BD
+            let currentRSI = ZERO_BD
             if (fund.RSITrendingStrategy != "") {
                 let strategy = RSITrendingStrategy.bind(Address.fromString(fund.RSITrendingStrategy))
                 callResult = strategy.try_getCurrentRSI()
                 if(callResult.reverted){
                     log.warning("Get try_getCurrentRSI reverted at block: {}", [block.number.toString()])
                 } else {
-                    currentRSI = callResult.value
+                    currentRSI = callResult.value.toBigDecimal()
                 }
 
                 callResult = strategy.try_getNextTarget()
                 if(callResult.reverted){
                     log.warning("Get try_getNextTarget reverted at block: {}", [block.number.toString()])
                 } else {
-                    nextTarget = callResult.value
+                    nextTarget = callResult.value.toBigDecimal()
                 }
 
             }

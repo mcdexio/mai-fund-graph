@@ -18,11 +18,12 @@ type UserInFund @entity {
   id: ID!
   user: User!
   fund: Fund!
-  shareAmount: BigInt!
-  redeemingShareAmount: BigInt!
-  totalPurchaseValue: BigInt!
-  totalRedeemValue: BigInt!
-  assetValue: BigInt!
+  shareAmount: BigDecimal!
+  redeemingShareAmount: BigDecimal!
+  totalPurchaseValue: BigDecimal!
+  totalRedeemValue: BigDecimal!
+  totalRedeemedValue: BigDecimal!
+  assetValue: BigDecimal!
   firstPurchaseTime: Int!
 
   purchases: [Purchase!]! @derivedFrom(field: "userInFund")
@@ -43,25 +44,25 @@ type Fund @entity {
   state: Int!
 
   # contract param
-  redeemingLockPeriod: BigInt!
-  entranceFeeRate: BigInt!
-  streamingFeeRate: BigInt!
-  performanceFeeRate: BigInt!
-  globalRedeemingSlippage: BigInt!
-  cap: BigInt!
-  drawdownHighWaterMark: BigInt!
-  leverageHighWaterMark: BigInt!
+  redeemingLockPeriod: BigDecimal!
+  entranceFeeRate: BigDecimal!
+  streamingFeeRate: BigDecimal!
+  performanceFeeRate: BigDecimal!
+  globalRedeemingSlippage: BigDecimal!
+  cap: BigDecimal!
+  drawdownHighWaterMark: BigDecimal!
+  leverageHighWaterMark: BigDecimal!
 
   # AutoTrading fund
   RSITrendingStrategy: String
-  rebalanceSlippage: BigInt
-  rebalanceTolerance: BigInt
+  rebalanceSlippage: BigDecimal
+  rebalanceTolerance: BigDecimal
 
   # SocialTrading fund
   manager: String
 
-  totalSupply: BigInt!
-  initNetAssetValuePerShare: BigInt!
+  totalSupply: BigDecimal!
+  initNetAssetValuePerShare: BigDecimal!
   initTimestamp: Int!
   
   userInFunds: [UserInFund!]! @derivedFrom(field:"fund")
@@ -78,8 +79,8 @@ type Purchase @entity {
   fund: Fund!
   to: User!
   userInFund: UserInFund!
-  shareAmount: BigInt!
-  netAssetValuePerShare: BigInt
+  shareAmount: BigDecimal!
+  netAssetValuePerShare: BigDecimal
   logIndex: BigInt
 }
 
@@ -91,8 +92,8 @@ type Redeemed @entity {
   fund: Fund!
   from: User!
   userInFund: UserInFund!
-  shareAmount: BigInt!
-  returnedCollateral: BigInt
+  shareAmount: BigDecimal!
+  returnedCollateral: BigDecimal
   logIndex: BigInt
 }
 
@@ -105,8 +106,8 @@ type Redeem @entity {
   user: User!
   transactionHash: String!
   userInFund: UserInFund!
-  shareAmount: BigInt!
-  slippage: BigInt
+  shareAmount: BigDecimal!
+  slippage: BigDecimal
 }
 
 type FundHourData @entity {
@@ -114,9 +115,9 @@ type FundHourData @entity {
   id: ID!
   hourStartUnix: Int! # unix timestamp for start of hour
   fund: Fund!
-  netAssetValuePerShareUnderlying: BigInt!
-  netAssetValuePerShareUSD: BigInt!
+  netAssetValuePerShareUnderlying: BigDecimal!
+  netAssetValuePerShareUSD: BigDecimal!
   # for auto trading fund rsi strategy
-  nextTarget: BigInt
-  currentRSI: BigInt
+  nextTarget: BigDecimal
+  currentRSI: BigDecimal
 }
