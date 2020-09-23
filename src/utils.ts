@@ -77,7 +77,7 @@ export function fetchFund(address: Address): Fund {
 
       fund.totalSupply = ZERO_BI
       fund.initNetAssetValuePerShare = ZERO_BI
-      fund.initTimestamp = ZERO_BI
+      fund.initTimestamp = 0
 
       fund.save()
     }

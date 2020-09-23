@@ -83,7 +83,7 @@ export function handleTransfer(event:TransferEvent): void {
     if (transaction == null) {
         transaction = new Transaction(transactionHash)
         transaction.blockNumber = event.block.number
-        transaction.timestamp = event.block.timestamp
+        transaction.timestamp = event.block.timestamp.toI32()
         transaction.purchases = []
         transaction.redeems = []
     }
@@ -98,7 +98,7 @@ export function handleTransfer(event:TransferEvent): void {
                   .concat(BigInt.fromI32(purchases.length).toString())
             )
             purchase.transaction = transaction.id
-            purchase.timestamp = transaction.timestamp
+            purchase.timestamp = transaction.timestamp.toI32()
             purchase.fund = fund.id
             purchase.to = userTo.id
             purchase.userInFund = userInFundTo.id
@@ -122,7 +122,7 @@ export function handleTransfer(event:TransferEvent): void {
                   .concat(BigInt.fromI32(redeems.length).toString())
             )
             redeem.transaction = transaction.id
-            redeem.timestamp = transaction.timestamp
+            redeem.timestamp = transaction.timestamp.toI32()
             redeem.fund = fund.id
             redeem.from = userFrom.id
             redeem.userInFund = userInFundFrom.id
@@ -167,7 +167,7 @@ export function handlePurchase(event: PurchaseEvent): void {
     let fund = fetchFund(event.address)
     if (fund.totalSupply == ZERO_BI) {
        fund.initNetAssetValuePerShare = event.params.netAssetValuePerShare
-       fund.initTimestamp = event.block.timestamp
+       fund.initTimestamp = event.block.timestamp.toI32()
     }
     fund.totalSupply = fund.totalSupply.plus(event.params.shareAmount)
     fund.save()

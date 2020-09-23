@@ -71,7 +71,7 @@ type Purchase @entity {
   # transaction hash + "-" + index in purchase Transaction array
   id: ID!
   transaction: Transaction!
-  timestamp: BigInt!
+  timestamp: Int!
   fund: Fund!
   to: User!
   userInFund: UserInFund!
@@ -84,7 +84,7 @@ type Redeem @entity {
   # transaction hash + "-" + index in redeem Transaction array
   id: ID!
   transaction: Transaction!
-  timestamp: BigInt!
+  timestamp: Int!
   fund: Fund!
   from: User!
   userInFund: UserInFund!
