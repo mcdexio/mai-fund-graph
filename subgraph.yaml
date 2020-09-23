@@ -56,7 +56,10 @@ dataSources:
           handler: handleIncreaseRedeemingShareBalance
         - event: DecreaseRedeemingShareBalance(indexed address,uint256)
           handler: handleDecreaseRedeemingShareBalance
-        # - event: UpdateState()
+        - event: RequestToRedeem(indexed address,uint256,uint256)
+          handler: handleRequestToRedeem
+        - event: CancelRedeeming(indexed address,uint256)
+          handler: handleCancelRedeeming
       blockHandlers:
         - handler: handleBlock
       file: ./src/fund.ts

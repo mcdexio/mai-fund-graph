@@ -4,7 +4,7 @@ type Transaction @entity {
   timestamp: Int!
   blockNumber: BigInt!
   purchases: [Purchase]!
-  redeems: [Redeem]!
+  redeemeds: [Redeemed]!
 }
 
 type User @entity {
@@ -23,9 +23,11 @@ type UserInFund @entity {
   totalPurchaseValue: BigInt!
   totalRedeemValue: BigInt!
   assetValue: BigInt!
+  fisrtPurchaseTime: Int!
 
   purchases: [Purchase!]! @derivedFrom(field: "userInFund")
   redeems: [Redeem!]! @derivedFrom(field: "userInFund")
+  redeemeds: [Redeemed!]! @derivedFrom(field: "userInFund")
 }
 
 type Fund @entity {
@@ -65,6 +67,7 @@ type Fund @entity {
   userInFunds: [UserInFund!]! @derivedFrom(field:"fund")
   purchases: [Purchase!]! @derivedFrom(field: "fund")
   redeems: [Redeem!]! @derivedFrom(field: "fund")
+  redeemeds: [Redeemed!]! @derivedFrom(field: "fund")
 }
 
 type Purchase @entity {
@@ -80,7 +83,7 @@ type Purchase @entity {
   logIndex: BigInt
 }
 
-type Redeem @entity {
+type Redeemed @entity {
   # transaction hash + "-" + index in redeem Transaction array
   id: ID!
   transaction: Transaction!
@@ -91,6 +94,18 @@ type Redeem @entity {
   shareAmount: BigInt!
   returnedCollateral: BigInt
   logIndex: BigInt
+}
+
+type Redeem @entity {
+  # user address + "-" + transaction hash + "-" + logIndex
+  id: ID!
+  timestamp: Int!
+  type: Int! # 0: request, 1: cancel
+  fund: Fund!
+  user: User!
+  userInFund: UserInFund!
+  shareAmount: BigInt!
+  slippage: BigInt
 }
 
 type FundHourData @entity {

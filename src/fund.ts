@@ -6,6 +6,8 @@ import {
     SetParameter as SetParameterEvent,
     IncreaseRedeemingShareBalance as IncreaseRedeemingShareBalanceEvent,
     DecreaseRedeemingShareBalance as DecreaseRedeemingShareBalanceEvent,
+    RequestToRedeem as RequestToRedeemEvent,
+    CancelRedeeming as CancelRedeemingEvent,
     Fund as FundContract
 } from '../generated/mai-fund-graph/Fund';
 
@@ -33,7 +35,7 @@ import {
     isUSDCollateral
 } from './utils'
 
-import { Fund, Purchase, Redeem, Transaction, FundHourData } from '../generated/schema';
+import { Fund, Purchase, Redeem, Redeemed, Transaction, FundHourData } from '../generated/schema';
 
 export function handleSetParameter(event: SetParameterEvent): void {
     let fund = fetchFund(event.address)
@@ -85,7 +87,7 @@ export function handleTransfer(event:TransferEvent): void {
         transaction.blockNumber = event.block.number
         transaction.timestamp = event.block.timestamp.toI32()
         transaction.purchases = []
-        transaction.redeems = []
+        transaction.redeemeds = []
     }
     // purchase
     if (from.toHexString() == ADDRESS_ZERO) {
@@ -98,7 +100,7 @@ export function handleTransfer(event:TransferEvent): void {
                   .concat(BigInt.fromI32(purchases.length).toString())
             )
             purchase.transaction = transaction.id
-            purchase.timestamp = transaction.timestamp.toI32()
+            purchase.timestamp = transaction.timestamp
             purchase.fund = fund.id
             purchase.to = userTo.id
             purchase.userInFund = userInFundTo.id
@@ -113,24 +115,24 @@ export function handleTransfer(event:TransferEvent): void {
 
     // redeem
     if (to.toHexString() == ADDRESS_ZERO) {
-        let redeems = transaction.purchases
-        if (redeems.length === 0) {
-            let redeem = new Redeem(
+        let redeemeds = transaction.redeemeds
+        if (redeemeds.length === 0) {
+            let redeemed = new Redeemed(
                 event.transaction.hash
                   .toHexString()
                   .concat('-')
-                  .concat(BigInt.fromI32(redeems.length).toString())
+                  .concat(BigInt.fromI32(redeemeds.length).toString())
             )
-            redeem.transaction = transaction.id
-            redeem.timestamp = transaction.timestamp.toI32()
-            redeem.fund = fund.id
-            redeem.from = userFrom.id
-            redeem.userInFund = userInFundFrom.id
-            redeem.shareAmount = event.params.value
-            redeem.save()
+            redeemed.transaction = transaction.id
+            redeemed.timestamp = transaction.timestamp
+            redeemed.fund = fund.id
+            redeemed.from = userFrom.id
+            redeemed.userInFund = userInFundFrom.id
+            redeemed.shareAmount = event.params.value
+            redeemed.save()
 
-            redeems.push(redeem.id)
-            transaction.redeems = redeems
+            redeemeds.push(redeemed.id)
+            transaction.redeemeds = redeemeds
             transaction.save()
         }
     }
@@ -175,12 +177,12 @@ export function handlePurchase(event: PurchaseEvent): void {
 
 export function handleRedeem(event: RedeemEvent): void {
     let transaction = Transaction.load(event.transaction.hash.toHexString())
-    let redeems = transaction.redeems
-    let redeem = Redeem.load(redeems[redeems.length - 1])
+    let redeemeds = transaction.redeemeds
+    let redeemed = Redeemed.load(redeemeds[redeemeds.length - 1])
 
-    redeem.returnedCollateral = event.params.returnedCollateral
-    redeem.logIndex = event.logIndex
-    redeem.save()
+    redeemed.returnedCollateral = event.params.returnedCollateral
+    redeemed.logIndex = event.logIndex
+    redeemed.save()
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
     userInFund.shareAmount = userInFund.shareAmount.minus(event.params.shareAmount)
@@ -203,6 +205,49 @@ export function handleDecreaseRedeemingShareBalance(event: DecreaseRedeemingShar
     let userInFund = fetchUserInFund(event.params.trader, event.address)
     userInFund.redeemingShareAmount = userInFund.redeemingShareAmount.minus(event.params.amount)
     userInFund.save()
+}
+
+export function handleRequestToRedeem(event: RequestToRedeemEvent): void {
+    let userInFund = fetchUserInFund(event.params.account, event.address)
+    let fund = fetchFund(event.address)
+    let user = fetchUser(event.params.account)
+    let redeem = new Redeem(
+          event.params.account
+          .toHexString()
+          .concat('-')
+          .concat(event.transaction.hash.toHexString())
+          .concat('-')
+          .concat(event.logIndex.toString())
+    )
+    redeem.timestamp = event.block.timestamp.toI32()
+    redeem.fund = fund.id
+    redeem.user = user.id
+    redeem.type = 0
+    redeem.userInFund = userInFund.id
+    redeem.shareAmount = event.params.shareAmount
+    redeem.slippage = event.params.slippage
+    redeem.save()
+}
+
+export function handleCancelRedeeming(event:CancelRedeemingEvent): void {
+    let userInFund = fetchUserInFund(event.params.account, event.address)
+    let fund = fetchFund(event.address)
+    let user = fetchUser(event.params.account)
+    let redeem = new Redeem(
+          event.params.account
+          .toHexString()
+          .concat('-')
+          .concat(event.transaction.hash.toHexString())
+          .concat('-')
+          .concat(event.logIndex.toString())
+    )
+    redeem.timestamp = event.block.timestamp.toI32()
+    redeem.fund = fund.id
+    redeem.user = user.id
+    redeem.type = 1
+    redeem.userInFund = userInFund.id
+    redeem.shareAmount = event.params.shareAmount
+    redeem.save()
 }
 
 export function handleBlock(block: ethereum.Block): void {
