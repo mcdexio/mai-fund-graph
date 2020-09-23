@@ -169,7 +169,7 @@ export function handlePurchase(event: PurchaseEvent): void {
 
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
-    userInFund.shareAmount = userInFund.shareAmount.plus(netAssetValuePerShare)
+    userInFund.shareAmount = userInFund.shareAmount.plus(shareAmount)
     userInFund.totalPurchaseValue = userInFund.totalPurchaseValue.plus(netAssetValuePerShare.times(shareAmount))
     userInFund.assetValue = userInFund.assetValue.plus(netAssetValuePerShare.times(shareAmount))
     if (userInFund.firstPurchaseTime == 0) {
