@@ -111,6 +111,7 @@ export function fetchUserInFund(userAddress: Address, fundAddress: Address): Use
     userInFund.totalPurchaseValue = ZERO_BI
     userInFund.totalRedeemValue = ZERO_BI
     userInFund.assetValue = ZERO_BI
+    userInFund.fisrtPurchaseTime = 0
 
     userInFund.save()
   }

@@ -164,6 +164,9 @@ export function handlePurchase(event: PurchaseEvent): void {
     userInFund.shareAmount = userInFund.shareAmount.plus(event.params.shareAmount)
     userInFund.totalPurchaseValue = userInFund.totalPurchaseValue.plus(event.params.netAssetValuePerShare.times(event.params.shareAmount))
     userInFund.assetValue = userInFund.assetValue.plus(event.params.netAssetValuePerShare.times(event.params.shareAmount))
+    if (userInFund.fisrtPurchaseTime == 0) {
+        userInFund.fisrtPurchaseTime = event.block.timestamp.toI32()
+    }
     userInFund.save()
 
     let fund = fetchFund(event.address)
