@@ -201,7 +201,7 @@ export function handleRedeem(event: RedeemEvent): void {
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
     userInFund.shareAmount = userInFund.shareAmount.minus(shareAmount)
-    userInFund.totalRedeemedShare = userInFund.totalRedeemedShare.minus(shareAmount)
+    userInFund.totalRedeemedShare = userInFund.totalRedeemedShare.plus(shareAmount)
     userInFund.costCollateral = userInFund.costCollateral.minus(returnedCollateral)
     userInFund.totalRedeemedValue = userInFund.totalRedeemedValue.plus(returnedCollateral)
     userInFund.save()
