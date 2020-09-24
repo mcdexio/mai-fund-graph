@@ -144,7 +144,7 @@ export function handleTransfer(event:TransferEvent): void {
 
     // swap
     if (from.toHexString() != ADDRESS_ZERO && to.toHexString() != ADDRESS_ZERO) {
-        let swapedAssetValue = userInFundFrom.ascostCollateralsetValue.div(userInFundFrom.shareAmount).times(userInFundFrom.shareAmount.minus(value))
+        let swapedAssetValue = userInFundFrom.costCollateral.div(userInFundFrom.shareAmount).times(userInFundFrom.shareAmount.minus(value))
         userInFundFrom.shareAmount = userInFundFrom.shareAmount.minus(value)
         userInFundFrom.costCollateral = userInFundFrom.costCollateral.minus(swapedAssetValue)
         userInFundFrom.save()
