@@ -21,9 +21,8 @@ type UserInFund @entity {
   shareAmount: BigDecimal!
   redeemingShareAmount: BigDecimal!
   totalPurchaseValue: BigDecimal!
-  totalRedeemValue: BigDecimal!
   totalRedeemedValue: BigDecimal!
-  assetValue: BigDecimal!
+  costCollateral: BigDecimal!
   firstPurchaseTime: Int!
 
   purchases: [Purchase!]! @derivedFrom(field: "userInFund")

@@ -144,13 +144,13 @@ export function handleTransfer(event:TransferEvent): void {
 
     // swap
     if (from.toHexString() != ADDRESS_ZERO && to.toHexString() != ADDRESS_ZERO) {
-        let swapedAssetValue = userInFundFrom.assetValue.div(userInFundFrom.shareAmount).times(userInFundFrom.shareAmount.minus(value))
+        let swapedAssetValue = userInFundFrom.ascostCollateralsetValue.div(userInFundFrom.shareAmount).times(userInFundFrom.shareAmount.minus(value))
         userInFundFrom.shareAmount = userInFundFrom.shareAmount.minus(value)
-        userInFundFrom.assetValue = userInFundFrom.assetValue.minus(swapedAssetValue)
+        userInFundFrom.costCollateral = userInFundFrom.costCollateral.minus(swapedAssetValue)
         userInFundFrom.save()
     
         userInFundTo.shareAmount = userInFundTo.shareAmount.plus(value)
-        userInFundTo.assetValue = userInFundTo.assetValue.plus(swapedAssetValue)
+        userInFundTo.costCollateral = userInFundTo.costCollateral.plus(swapedAssetValue)
         userInFundTo.save()
     }
 }
@@ -171,7 +171,7 @@ export function handlePurchase(event: PurchaseEvent): void {
     let userInFund = fetchUserInFund(event.params.account, event.address)
     userInFund.shareAmount = userInFund.shareAmount.plus(shareAmount)
     userInFund.totalPurchaseValue = userInFund.totalPurchaseValue.plus(netAssetValuePerShare.times(shareAmount))
-    userInFund.assetValue = userInFund.assetValue.plus(netAssetValuePerShare.times(shareAmount))
+    userInFund.costCollateral = userInFund.costCollateral.plus(netAssetValuePerShare.times(shareAmount))
     if (userInFund.firstPurchaseTime == 0) {
         userInFund.firstPurchaseTime = event.block.timestamp.toI32()
     }
@@ -200,7 +200,7 @@ export function handleRedeem(event: RedeemEvent): void {
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
     userInFund.shareAmount = userInFund.shareAmount.minus(shareAmount)
-    userInFund.assetValue = userInFund.assetValue.minus(returnedCollateral)
+    userInFund.costCollateral = userInFund.costCollateral.minus(returnedCollateral)
     userInFund.totalRedeemedValue = userInFund.totalRedeemedValue.plus(returnedCollateral)
     userInFund.save()
 
@@ -247,8 +247,6 @@ export function handleRequestToRedeem(event: RequestToRedeemEvent): void {
     redeem.shareAmount = convertToDecimal(event.params.shareAmount, BI_18)
     redeem.slippage = convertToDecimal(event.params.slippage, BI_18)
     redeem.save()
-    userInFund.totalRedeemValue = userInFund.totalRedeemValue.plus(redeem.shareAmount)
-    userInFund.save()
 }
 
 export function handleCancelRedeeming(event:CancelRedeemingEvent): void {
@@ -272,8 +270,6 @@ export function handleCancelRedeeming(event:CancelRedeemingEvent): void {
     redeem.userInFund = userInFund.id
     redeem.shareAmount = convertToDecimal(event.params.shareAmount, BI_18)
     redeem.save()
-    userInFund.totalRedeemValue = userInFund.totalRedeemValue.minus(redeem.shareAmount)
-    userInFund.save()
 }
 
 export function handleBlock(block: ethereum.Block): void {
