@@ -22,6 +22,8 @@ type UserInFund @entity {
   redeemingShareAmount: BigDecimal!
   totalPurchaseValue: BigDecimal!
   totalRedeemedValue: BigDecimal!
+  totalPurchaseShare: BigDecimal!
+  totalRedeemedShare: BigDecimal!
   costCollateral: BigDecimal!
   firstPurchaseTime: Int!
 
