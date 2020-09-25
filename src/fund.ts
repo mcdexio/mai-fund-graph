@@ -170,7 +170,7 @@ export function handlePurchase(event: PurchaseEvent): void {
 
     let userInFund = fetchUserInFund(event.params.account, event.address)
     userInFund.shareAmount = userInFund.shareAmount.plus(shareAmount)
-    userInFund.totalPurchaseValue = userInFund.totalPurchaseValue.plus(netAssetValuePerShare.times(shareAmount))
+    userInFund.totalPurchaseCollateral = userInFund.totalPurchaseCollateral.plus(netAssetValuePerShare.times(shareAmount))
     userInFund.totalPurchaseShare = userInFund.totalPurchaseShare.plus(shareAmount)
     userInFund.costCollateral = userInFund.costCollateral.plus(netAssetValuePerShare.times(shareAmount))
     if (userInFund.firstPurchaseTime == 0) {
@@ -203,7 +203,7 @@ export function handleRedeem(event: RedeemEvent): void {
     userInFund.shareAmount = userInFund.shareAmount.minus(shareAmount)
     userInFund.totalRedeemedShare = userInFund.totalRedeemedShare.plus(shareAmount)
     userInFund.costCollateral = userInFund.costCollateral.minus(returnedCollateral)
-    userInFund.totalRedeemedValue = userInFund.totalRedeemedValue.plus(returnedCollateral)
+    userInFund.totalRedeemedCollateral = userInFund.totalRedeemedCollateral.plus(returnedCollateral)
     userInFund.save()
 
     let fund = fetchFund(event.address)

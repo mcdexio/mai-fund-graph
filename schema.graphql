@@ -20,8 +20,8 @@ type UserInFund @entity {
   fund: Fund!
   shareAmount: BigDecimal!
   redeemingShareAmount: BigDecimal!
-  totalPurchaseValue: BigDecimal!
-  totalRedeemedValue: BigDecimal!
+  totalPurchaseCollateral: BigDecimal!
+  totalRedeemedCollateral: BigDecimal!
   totalPurchaseShare: BigDecimal!
   totalRedeemedShare: BigDecimal!
   costCollateral: BigDecimal!

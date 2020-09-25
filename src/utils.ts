@@ -108,8 +108,8 @@ export function fetchUserInFund(userAddress: Address, fundAddress: Address): Use
     userInFund.fund = fund.id
     userInFund.shareAmount = ZERO_BD
     userInFund.redeemingShareAmount = ZERO_BD
-    userInFund.totalPurchaseValue = ZERO_BD
-    userInFund.totalRedeemedValue = ZERO_BD
+    userInFund.totalPurchaseCollateral = ZERO_BD
+    userInFund.totalRedeemedCollateral = ZERO_BD
     userInFund.totalPurchaseShare = ZERO_BD
     userInFund.totalRedeemedShare = ZERO_BD
     userInFund.costCollateral = ZERO_BD
