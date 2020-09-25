@@ -116,6 +116,7 @@ type FundHourData @entity {
   id: ID!
   hourStartUnix: Int! # unix timestamp for start of hour
   fund: Fund!
+  netAssetValuePerShare: BigDecimal!
   netAssetValuePerShareUnderlying: BigDecimal!
   netAssetValuePerShareUSD: BigDecimal!
   # for auto trading fund rsi strategy

@@ -337,8 +337,8 @@ export function handleBlock(block: ethereum.Block): void {
                 } else {
                     nextTarget = convertToDecimal(callResult.value, BI_18)
                 }
-
             }
+            fundHourData.netAssetValuePerShare = netAssetValuePerShare
             fundHourData.netAssetValuePerShareUSD = netValueInUSD
             fundHourData.netAssetValuePerShareUnderlying = netValue
             fundHourData.nextTarget = nextTarget
