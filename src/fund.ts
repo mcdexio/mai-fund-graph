@@ -173,9 +173,7 @@ export function handlePurchase(event: PurchaseEvent): void {
     userInFund.totalPurchaseCollateral = userInFund.totalPurchaseCollateral.plus(netAssetValuePerShare.times(shareAmount))
     userInFund.totalPurchaseShare = userInFund.totalPurchaseShare.plus(shareAmount)
     userInFund.costCollateral = userInFund.costCollateral.plus(netAssetValuePerShare.times(shareAmount))
-    if (userInFund.firstPurchaseTime == 0) {
-        userInFund.firstPurchaseTime = event.block.timestamp.toI32()
-    }
+    userInFund.lastPurchaseTime = event.block.timestamp.toI32()
     userInFund.save()
 
     let fund = fetchFund(event.address)

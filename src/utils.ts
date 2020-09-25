@@ -113,7 +113,7 @@ export function fetchUserInFund(userAddress: Address, fundAddress: Address): Use
     userInFund.totalPurchaseShare = ZERO_BD
     userInFund.totalRedeemedShare = ZERO_BD
     userInFund.costCollateral = ZERO_BD
-    userInFund.firstPurchaseTime = 0
+    userInFund.lastPurchaseTime = 0
 
     userInFund.save()
   }
