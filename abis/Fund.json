@@ -334,6 +334,12 @@
         "internalType": "uint256",
         "name": "shareAmount",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "collateralToReturn",
+        "type": "uint256"
       }
     ],
     "name": "Settle",
