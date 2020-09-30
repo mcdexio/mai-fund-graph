@@ -24,6 +24,10 @@ import {
 } from '../generated/mai-fund-graph/SocialTradingFund';
 
 import {
+    Rebalance as RebalanceEvent,
+} from '../generated/mai-fund-graph/SocialTradingFund';
+
+import {
     fetchFund,
     fetchUser,
     fetchUserInFund,
@@ -38,7 +42,7 @@ import {
     isUSDCollateral
 } from './utils'
 
-import { Fund, Purchase, Redeem, Redeemed, Transaction, FundHourData } from '../generated/schema';
+import { Fund, Purchase, Redeem, Redeemed, Transaction, FundHourData, Rebalance } from '../generated/schema';
 
 export function handleSetParameter(event: SetParameterEvent): void {
     let fund = fetchFund(event.address)
@@ -270,6 +274,21 @@ export function handleCancelRedeeming(event:CancelRedeemingEvent): void {
     redeem.userInFund = userInFund.id
     redeem.shareAmount = convertToDecimal(event.params.shareAmount, BI_18)
     redeem.save()
+}
+
+export function handleRebalance(event:RebalanceEvent): void {
+    let transactionHash = event.transaction.hash.toHexString()
+    let rebalance = new Rebalance(
+        event.address
+        .toHexString()
+        .concat('-')
+        .concat(transactionHash)
+    )
+    rebalance.timestamp = event.block.timestamp.toI32()
+    rebalance.side = event.params.side
+    rebalance.price = convertToDecimal(event.params.price, BI_18)
+    rebalance.amount = convertToDecimal(event.params.amount, BI_18)
+    rebalance.save()
 }
 
 export function handleBlock(block: ethereum.Block): void {

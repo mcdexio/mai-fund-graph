@@ -123,3 +123,13 @@ type FundHourData @entity {
   nextTarget: BigDecimal
   currentRSI: BigDecimal
 }
+
+# AutoTradingFund only
+type Rebalance @entity {
+  # fund Address + "-" + transaction hash
+  id: ID!
+  timestamp: Int!
+  side: Int!
+  price: BigDecimal!
+  amount: BigDecimal!
+}

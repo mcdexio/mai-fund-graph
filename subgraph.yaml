@@ -60,6 +60,8 @@ dataSources:
           handler: handleRequestToRedeem
         - event: CancelRedeeming(indexed address,uint256)
           handler: handleCancelRedeeming
+        - event: Rebalance(LibTypes.Side side,uint256 price,uint256 amount)
+          handler: handleRebalance
       blockHandlers:
         - handler: handleBlock
       file: ./src/fund.ts
