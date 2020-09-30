@@ -285,7 +285,7 @@ export function handleRebalance(event:RebalanceEvent): void {
         .concat('-')
         .concat(transactionHash)
     )
-    rebalance.fund = fund
+    rebalance.fund = fund.id
     rebalance.timestamp = event.block.timestamp.toI32()
     rebalance.side = event.params.side
     rebalance.price = convertToDecimal(event.params.price, BI_18)
