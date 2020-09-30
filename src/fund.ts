@@ -277,6 +277,7 @@ export function handleCancelRedeeming(event:CancelRedeemingEvent): void {
 }
 
 export function handleRebalance(event:RebalanceEvent): void {
+    let fund = fetchFund(event.address)
     let transactionHash = event.transaction.hash.toHexString()
     let rebalance = new Rebalance(
         event.address
@@ -284,6 +285,7 @@ export function handleRebalance(event:RebalanceEvent): void {
         .concat('-')
         .concat(transactionHash)
     )
+    rebalance.fund = fund
     rebalance.timestamp = event.block.timestamp.toI32()
     rebalance.side = event.params.side
     rebalance.price = convertToDecimal(event.params.price, BI_18)
