@@ -8,9 +8,9 @@ dataSources:
     name: mai-fund-graph
     network: mainnet
     source:
-      address: '0xA8cD84eE8aD8eC1c7ee19E578F2825cDe18e56d1'
+      address: '0xbB0124BC0bE0F9ace2e1b01e7F2d08fb5b26C061'
       abi: Fund
-      startBlock: 75100
+      startBlock: 126395
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
