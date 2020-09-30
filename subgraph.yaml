@@ -62,6 +62,10 @@ dataSources:
           handler: handleCancelRedeeming
         - event: Rebalance(uint8,uint256,uint256)
           handler: handleRebalance
+        - event: Settle(indexed address,uint256)
+          handler: handleSettle
+        - event: UpdateState(uint8)
+          handler: handleUpdateState
       blockHandlers:
         - handler: handleBlock
       file: ./src/fund.ts

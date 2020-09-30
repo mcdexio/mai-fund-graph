@@ -8,6 +8,8 @@ import {
     DecreaseRedeemingShareBalance as DecreaseRedeemingShareBalanceEvent,
     RequestToRedeem as RequestToRedeemEvent,
     CancelRedeeming as CancelRedeemingEvent,
+    Settle as SettleEvent,
+    UpdateState as UpdateStateEvent,
     Fund as FundContract
 } from '../generated/mai-fund-graph/Fund';
 
@@ -69,6 +71,12 @@ export function handleSetParameter(event: SetParameterEvent): void {
     } else if (key == "rebalanceTolerance") {
         fund.rebalanceTolerance = value
     }
+    fund.save()
+}
+
+export function handleUpdateState(event: UpdateStateEvent): void {
+    let fund = fetchFund(event.address)
+    fund.state = event.params.newState
     fund.save()
 }
 
@@ -213,6 +221,21 @@ export function handleRedeem(event: RedeemEvent): void {
     fund.save()
 }
 
+export function handleSettle(event: SettleEvent): void {
+    let shareAmount = convertToDecimal(event.params.shareAmount, BI_18)
+    let collateralToReturn = convertToDecimal(event.params.collateralToReturn, BI_18)
+
+    let userInFund = fetchUserInFund(event.params.account, event.address)
+    userInFund.shareAmount = userInFund.shareAmount.minus(shareAmount)
+    userInFund.totalRedeemedShare = userInFund.totalRedeemedShare.plus(shareAmount)
+    userInFund.costCollateral = userInFund.costCollateral.minus(collateralToReturn)
+    userInFund.totalRedeemedCollateral = userInFund.totalRedeemedCollateral.plus(collateralToReturn)
+    userInFund.save()
+    let fund = fetchFund(event.address)
+    fund.totalSupply = fund.totalSupply.minus(shareAmount)
+    fund.save()
+}
+
 export function handleIncreaseRedeemingShareBalance(event: IncreaseRedeemingShareBalanceEvent): void {
     let userInFund = fetchUserInFund(event.params.trader, event.address)
     let amount = convertToDecimal(event.params.amount, BI_18)
@@ -296,7 +319,9 @@ export function handleRebalance(event:RebalanceEvent): void {
 export function handleBlock(block: ethereum.Block): void {
     for (let i = 0; i < FUND_LIST.length; i++) {
         let fund = fetchFund(Address.fromString(FUND_LIST[i]))
-
+        if (fund.state != 0) {
+            continue
+        }
         // hour data
         let timestamp = block.timestamp.toI32()
         let hourIndex = timestamp / 3600
