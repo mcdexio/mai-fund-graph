@@ -60,7 +60,7 @@ dataSources:
           handler: handleRequestToRedeem
         - event: CancelRedeeming(indexed address,uint256)
           handler: handleCancelRedeeming
-        - event: Rebalance(LibTypes.Side side,uint256 price,uint256 amount)
+        - event: Rebalance(uint8,uint256,uint256)
           handler: handleRebalance
       blockHandlers:
         - handler: handleBlock
