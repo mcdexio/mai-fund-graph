@@ -25,7 +25,7 @@ import {
 
 import {
     Rebalance as RebalanceEvent,
-} from '../generated/mai-fund-graph/SocialTradingFund';
+} from '../generated/mai-fund-graph/AutoTradingFund';
 
 import {
     fetchFund,
