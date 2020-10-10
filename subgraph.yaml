@@ -8,9 +8,43 @@ dataSources:
     name: mai-fund-graph
     network: mainnet
     source:
-      address: '0xbB0124BC0bE0F9ace2e1b01e7F2d08fb5b26C061'
+      address: '0x38884E823E6F1Cd93757eD74b06380B22761A3De'
+      abi: AutoTradingFund
+      startBlock: 137595
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - FundHourData
+      abis:
+        - name: Fund
+          file: ./abis/Fund.json
+        - name: AutoTradingFund
+          file: ./abis/AutoTradingFund.json
+        - name: RSITrendingStrategy
+          file: ./abis/RSITrendingStrategy.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: Perpetual
+          file: ./abis/Perpetual.json
+      eventHandlers:
+        - event: Rebalance(uint8,uint256,uint256)
+          handler: handleRebalance
+      blockHandlers:
+        - handler: handleETHPerpFund 
+      file: ./src/eachFund.ts
+
+templates:
+  - kind: ethereum/contract
+    name: commonFund
+    network: mainnet
+    source:
       abi: Fund
-      startBlock: 126395
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -22,25 +56,9 @@ dataSources:
         - Fund
         - Purchase
         - Redeem
-        - FundHourData
-        - FundBlockData
       abis:
         - name: Fund
           file: ./abis/Fund.json
-        - name: SocialTradingFund
-          file: ./abis/SocialTradingFund.json
-        - name: AutoTradingFund
-          file: ./abis/AutoTradingFund.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: ERC20SymbolBytes
-          file: ./abis/ERC20SymbolBytes.json
-        - name: ERC20NameBytes
-          file: ./abis/ERC20NameBytes.json
-        - name: Perpetual
-          file: ./abis/Perpetual.json
-        - name: RSITrendingStrategy
-          file: ./abis/RSITrendingStrategy.json
       eventHandlers:
         - event: Purchase(indexed address,uint256,uint256)
           handler: handlePurchase
@@ -60,12 +78,8 @@ dataSources:
           handler: handleRequestToRedeem
         - event: CancelRedeeming(indexed address,uint256)
           handler: handleCancelRedeeming
-        - event: Rebalance(uint8,uint256,uint256)
-          handler: handleRebalance
         - event: Settle(indexed address,uint256,uint256)
           handler: handleSettle
         - event: UpdateState(uint8)
           handler: handleUpdateState
-      blockHandlers:
-        - handler: handleBlock
-      file: ./src/fund.ts
+      file: ./src/commonFund.ts
