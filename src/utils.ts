@@ -6,7 +6,7 @@ import { ERC20 } from '../generated/mai-fund-graph/ERC20'
 import { ERC20SymbolBytes } from '../generated/mai-fund-graph/ERC20SymbolBytes'
 import { ERC20NameBytes } from '../generated/mai-fund-graph/ERC20NameBytes'
 import { Fund as FundContract } from '../generated/mai-fund-graph/Fund'
-
+import { commonFund as FundTemplate } from '../generated/templates'
 
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
@@ -48,6 +48,9 @@ export function getRSITrendingStrategy(address: Address): string {
 export function fetchFund(address: Address): Fund {
     let fund = Fund.load(address.toHexString())
     if (fund === null) {
+      // create the tracked contract based on the template
+      FundTemplate.create(address)
+      
       fund = new Fund(address.toHexString())
       fund.symbol = fetchTokenSymbol(address)
       fund.name = fetchTokenName(address)

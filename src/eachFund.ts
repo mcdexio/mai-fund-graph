@@ -22,7 +22,6 @@ import {
 } from './utils'
 
 import {FundHourData, Rebalance} from '../generated/schema';
-import { commonFund as FundTemplate } from '../generated/templates'
 
 import {
     SetManager as SetManagerEvent,
@@ -63,9 +62,6 @@ export function handleETHPerpFund(block: ethereum.Block): void {
 }
 
 export function handleBlock(block: ethereum.Block, address: Address): void {
-    // create the tracked contract based on the template
-    FundTemplate.create(address)
-
     let fund = fetchFund(address)
     if (fund.state != 0) {
         return
