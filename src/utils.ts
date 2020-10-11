@@ -2,10 +2,7 @@ import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
 
 import { Fund, User, UserInFund } from '../generated/schema'
 
-import { ERC20 } from '../generated/mai-fund-graph/ERC20'
-import { ERC20SymbolBytes } from '../generated/mai-fund-graph/ERC20SymbolBytes'
-import { ERC20NameBytes } from '../generated/mai-fund-graph/ERC20NameBytes'
-import { Fund as FundContract } from '../generated/mai-fund-graph/Fund'
+import { Fund as FundContract } from '../generated/templates/commonFund/Fund'
 import { commonFund as FundTemplate } from '../generated/templates'
 
 
@@ -50,7 +47,7 @@ export function fetchFund(address: Address): Fund {
     if (fund === null) {
       // create the tracked contract based on the template
       FundTemplate.create(address)
-      
+
       fund = new Fund(address.toHexString())
       fund.symbol = fetchTokenSymbol(address)
       fund.name = fetchTokenName(address)
@@ -143,21 +140,10 @@ export function convertToDecimal(amount: BigInt, decimals: BigInt): BigDecimal {
 }
 
 export function fetchTokenName(tokenAddress: Address): string {
-  let contract = ERC20.bind(tokenAddress)
-  let contractNameBytes = ERC20NameBytes.bind(tokenAddress)
-
-  // try types string and bytes32 for name
+  let contract = FundContract.bind(tokenAddress)
   let nameValue = 'unknown'
   let nameResult = contract.try_name()
-  if (nameResult.reverted) {
-    let nameResultBytes = contractNameBytes.try_name()
-    if (!nameResultBytes.reverted) {
-      // for broken exchanges that have no name function exposed
-      if (!isNullEthValue(nameResultBytes.value.toHexString())) {
-        nameValue = nameResultBytes.value.toString()
-      }
-    }
-  } else {
+  if (!nameResult.reverted) {
     nameValue = nameResult.value
   }
 
@@ -165,21 +151,10 @@ export function fetchTokenName(tokenAddress: Address): string {
 }
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
-  let contract = ERC20.bind(tokenAddress)
-  let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress)
-
-  // try types string and bytes32 for symbol
+  let contract = FundContract.bind(tokenAddress)
   let symbolValue = 'unknown'
   let symbolResult = contract.try_symbol()
-  if (symbolResult.reverted) {
-    let symbolResultBytes = contractSymbolBytes.try_symbol()
-    if (!symbolResultBytes.reverted) {
-      // for broken pairs that have no symbol function exposed
-      if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
-        symbolValue = symbolResultBytes.value.toString()
-      }
-    }
-  } else {
+  if (!symbolResult.reverted) {
     symbolValue = symbolResult.value
   }
 

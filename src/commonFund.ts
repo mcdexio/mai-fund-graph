@@ -10,7 +10,7 @@ import {
     CancelRedeeming as CancelRedeemingEvent,
     Settle as SettleEvent,
     UpdateState as UpdateStateEvent
-} from '../generated/mai-fund-graph/Fund';
+} from '../generated/templates/commonFund/Fund';
 
 import {
     fetchFund,

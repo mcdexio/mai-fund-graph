@@ -2,7 +2,7 @@ import { BigInt, ethereum, log, Address } from "@graphprotocol/graph-ts"
 
 import {
     Fund as FundContract
-} from '../generated/mai-fund-graph/Fund';
+} from '../generated/templates/commonFund/Fund';
 
 import {
     Perpetual,
