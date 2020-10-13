@@ -13,6 +13,7 @@ export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 
+// Notice lowercase
 export let FUND_LIST:string[] = ["0x38884e823e6f1cd93757ed74b06380b22761a3de"]
 export let FUND_RSI_LIST:string[] = ["0xe61dc1a443ac7f8f1aa56afa1197d6e822d254ad"]
 
@@ -34,7 +35,7 @@ export function isUSDCollateral(collateral: string): boolean {
 
 export function getRSITrendingStrategy(address: Address): string {
   for (let i = 0; i < FUND_LIST.length; i++) {
-    if (address.toHexString() == FUND_LIST[i].toLowerCase()) {
+    if (address.toHexString() == FUND_LIST[i]) {
       return FUND_RSI_LIST[i]
     }
   }
