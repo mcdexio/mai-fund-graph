@@ -5,12 +5,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: mai-graph-fund
+    name: mai-fund-graph
     network: mainnet
     source:
       address: '0xb4FEf03A65C49d76d8069AC8590956b1f5ff1446'
       abi: AutoTradingFund
-      startBlock: 11106370
+      startBlock: 11106413
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -22,6 +22,8 @@ dataSources:
           file: ./abis/Fund.json
         - name: AutoTradingFund
           file: ./abis/AutoTradingFund.json
+        - name: SocialTradingFund
+          file: ./abis/SocialTradingFund.json
         - name: RSITrendingStrategy
           file: ./abis/RSITrendingStrategy.json
         - name: Perpetual
