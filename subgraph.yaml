@@ -8,9 +8,9 @@ dataSources:
     name: mai-graph-fund
     network: mainnet
     source:
-      address: '0x38884E823E6F1Cd93757eD74b06380B22761A3De'
+      address: '0xb4FEf03A65C49d76d8069AC8590956b1f5ff1446'
       abi: AutoTradingFund
-      startBlock: 137595
+      startBlock: 11106370
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

@@ -57,7 +57,7 @@ export function handleRebalance(event:RebalanceEvent): void {
 
 // block handler for each fund, add new function when new fund created 
 export function handleETHPerpFund(block: ethereum.Block): void {
-    let fundAddress = Address.fromString("0x38884e823e6f1cd93757ed74b06380b22761a3de")
+    let fundAddress = Address.fromString("0xb4fef03a65c49d76d8069ac8590956b1f5ff1446")
     handleBlock(block, fundAddress)
 }
 

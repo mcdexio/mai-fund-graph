@@ -14,8 +14,8 @@ export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 
 // Notice lowercase
-export let FUND_LIST:string[] = ["0x38884e823e6f1cd93757ed74b06380b22761a3de"]
-export let FUND_RSI_LIST:string[] = ["0xe61dc1a443ac7f8f1aa56afa1197d6e822d254ad"]
+export let FUND_LIST:string[] = ["0xb4fef03a65c49d76d8069ac8590956b1f5ff1446"]
+export let FUND_RSI_LIST:string[] = ["0x623e6ae36d079fd1d587ca0c2b9c344a7cdff694"]
 
 // added ["USDT", "USDC", "DAI"]
 export let USDTokens:string[] = [
